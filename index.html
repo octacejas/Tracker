@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Tracker">
+    <meta name="apple-mobile-web-app-title" content="Detox OS">
     <title>Dopamine Detox OS</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,7 +26,8 @@
         .panel { background-color: var(--panel-bg); padding: 18px; border-radius: 14px; margin-bottom: 15px; }
         h2, h3 { margin-top: 0; font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
         
-        .level-box { background-color: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .level-box { background-color: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; position: relative;}
+        .rank-badge { position: absolute; top: 10px; right: 10px; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px;}
         .streaks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
         .stat-box { background-color: #2c2c2e; padding: 12px; border-radius: 12px; }
         .number-display { font-size: 2.2rem; font-weight: bold; margin: 5px 0; }
@@ -37,8 +38,8 @@
         .xp-bar-container { background-color: #000; border-radius: 8px; height: 12px; overflow: hidden; margin-top: 10px; }
         .xp-bar { height: 100%; background-color: var(--primary); width: 0%; transition: width 0.5s ease; }
         
-        .habit-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; margin:0;}
-        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #2c2c2e; border-radius: 12px; font-size: 0.95rem; }
+        .list-container { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; margin:0;}
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #2c2c2e; border-radius: 12px; font-size: 0.95rem; }
         
         button { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.1s; min-height: 44px; }
         button:active { transform: scale(0.95); }
@@ -50,10 +51,9 @@
         
         .reward-box { background-color: #2c2c2e; border-left: 4px solid var(--warning); padding: 12px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; line-height: 1.4;}
         
-        /* Edit Habits Section */
-        #editHabitsPanel { display: none; background-color: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .edit-panel { display: none; background-color: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
         .edit-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="text"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
+        input[type="text"], input[type="number"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
         
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-container { position: relative; height: 200px; width: 100%; }
@@ -65,13 +65,35 @@
         .cal-header { text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; }
         
         .small-text { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+
+        /* Estilos del Modal Pop-up */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #1c1c1e; border: 1px solid var(--border); padding: 30px 20px; border-radius: 20px; text-align: center; width: 85%; max-width: 350px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .modal-title { font-size: 1.5rem; color: var(--warning); margin-bottom: 5px; font-weight: 900;}
+        .modal-rank { font-size: 1.8rem; font-weight: bold; margin: 15px 0; text-transform: uppercase; }
+        .modal-reward { background: #2c2c2e; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 1rem; color: #fff;}
+        .btn-modal { background: var(--primary); color: #000; width: 100%; margin-top: 15px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- Modal Level Up -->
+    <div id="levelUpModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">¡NIVEL ALCANZADO!</div>
+            <div id="modalLvlNumber" style="font-size: 3rem; color: white; font-weight: bold;"></div>
+            <div id="modalRankDisplay" class="modal-rank"></div>
+            <div class="small-text">RECOMPENSA DESBLOQUEADA</div>
+            <div id="modalRewardText" class="modal-reward"></div>
+            <button class="btn-modal" onclick="closeModal()">Seguir farmeando</button>
+        </div>
+    </div>
+
     <div class="panel">
         <div class="level-box">
+            <div id="rankBadge" class="rank-badge"></div>
             <div class="small-text">NIVEL ACTUAL</div>
             <div class="number-display level-color" id="levelDisplay">1</div>
             <div class="small-text" style="text-transform: none;">XP Total: <span id="xpDisplay">0</span></div>
@@ -91,8 +113,25 @@
         </div>
     </div>
 
+    <!-- Panel de Recompensas -->
     <div class="panel">
-        <h3>🏆 Recompensa de Nivel</h3>
+        <h3>
+            <span>🏆 Recompensa de Nivel</span>
+            <button class="btn-icon" onclick="togglePanel('editRewardsPanel')">⚙️</button>
+        </h3>
+        
+        <div id="editRewardsPanel" class="edit-panel">
+            <div class="small-text" style="margin-bottom: 8px;">Agregar recompensa</div>
+            <div class="edit-input-group" style="flex-direction: column;">
+                <input type="number" id="newRewardLvl" placeholder="Nivel requerido (Ej: 5)">
+                <input type="text" id="newRewardText" placeholder="Ej: Cheat meal post-gym">
+                <button class="btn-add" onclick="addNewReward()">Guardar Recompensa</button>
+            </div>
+            <div class="small-text" style="margin-bottom: 8px;">Recompensas Actuales</div>
+            <ul class="list-container" id="editRewardList"></ul>
+            <button class="btn-danger" style="margin-top: 15px;" onclick="togglePanel('editRewardsPanel')">Cerrar</button>
+        </div>
+
         <div id="rewardDisplay" class="reward-box"></div>
     </div>
 
@@ -100,22 +139,21 @@
     <div class="panel">
         <h3>
             <span>📋 Hábitos Diarios (+15 XP)</span>
-            <button class="btn-icon" onclick="toggleEditMode()">⚙️</button>
+            <button class="btn-icon" onclick="togglePanel('editHabitsPanel')">⚙️</button>
         </h3>
         
-        <!-- Zona oculta para editar -->
-        <div id="editHabitsPanel">
+        <div id="editHabitsPanel" class="edit-panel">
             <div class="small-text" style="margin-bottom: 8px;">Agregar nuevo hábito</div>
             <div class="edit-input-group">
                 <input type="text" id="newHabitInput" placeholder="Ej: Leer 10 páginas...">
                 <button class="btn-add" onclick="addNewHabit()">Sumar</button>
             </div>
             <div class="small-text" style="margin-bottom: 8px;">Tus Hábitos Actuales</div>
-            <ul class="habit-list" id="editHabitList"></ul>
-            <button class="btn-danger" style="margin-top: 15px;" onclick="toggleEditMode()">Cerrar Edición</button>
+            <ul class="list-container" id="editHabitList"></ul>
+            <button class="btn-danger" style="margin-top: 15px;" onclick="togglePanel('editHabitsPanel')">Cerrar</button>
         </div>
 
-        <ul class="habit-list" id="habitList"></ul>
+        <ul class="list-container" id="habitList"></ul>
     </div>
 
     <div class="panel charts-grid">
@@ -143,36 +181,46 @@
 <script>
     const XP_PER_LEVEL = 100;
     const HABIT_XP = 15;
-    
-    // Podés modificar estos textos directo acá si querés cambiar las recompensas
-    const rewardsMap = {
-        1: "20 minutos de música y un video de autos.",
-        2: "Sesión inmersiva de música (Kanye, Carti, Opium) sin celular.",
-        3: "Hora libre para viciar GTA o Football Life sin culpa.",
-        4: "Día de Cheat Meal post-gym.",
-        5: "Salida o cena especial sin uso de pantallas.",
-        6: "Permiso para comprar un accesorio de gym o algo personal.",
-        10: "Día completo de ocio estructurado. Dominaste el sistema."
-    };
+    const PASSIVE_XP_PER_STREAK = 10; // 10 por porn, 10 por mast = 20 XP al día si estás limpio
 
     const defaultHabits = [
-        { id: 'gym', name: 'Gimnasio / Ejercicio' },
+        { id: 'gym', name: 'Gimnasio / Fuerza' },
         { id: 'music', name: 'Producir Música' },
-        { id: 'sleep', name: 'Dormir 8 hs' },
-        { id: 'journal', name: 'Gua Sha & Journal' }
+        { id: 'sleep', name: 'Dormir 8 hs' }
     ];
 
-    let userData = JSON.parse(localStorage.getItem('detoxDataV3')) || {
+    const defaultRewards = [
+        { level: 2, text: "20 minutos de música y un video de autos." },
+        { level: 3, text: "Hora libre en Valorant o GTA sin culpa." },
+        { level: 5, text: "Cheat Meal post-entrenamiento de fuerza." },
+        { level: 10, text: "Día libre absoluto. Dominaste el sistema." }
+    ];
+
+    let userData = JSON.parse(localStorage.getItem('detoxDataV4')) || {
         xp: 0,
         level: 1,
         lastPornRelapse: new Date().setHours(0,0,0,0),
         lastMastRelapse: new Date().setHours(0,0,0,0),
+        lastPassiveCheck: "", 
         completedHabits: {}, 
         history: {},
-        customHabits: defaultHabits // Nueva propiedad para guardar tus hábitos
+        customHabits: defaultHabits,
+        customRewards: defaultRewards
     };
 
     let chartInstance = null;
+
+    // Sistema de Rangos 
+    function getRank(level) {
+        if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "#2a2a2a" };
+        if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "#4a2e12" };
+        if (level < 10) return { name: "Plata", color: "#c0c0c0", bg: "#3a3a3a" };
+        if (level < 15) return { name: "Oro", color: "#ffd700", bg: "#4a3c00" };
+        if (level < 20) return { name: "Platino", color: "#00ced1", bg: "#004d4d" };
+        if (level < 25) return { name: "Diamante", color: "#b9f2ff", bg: "#2d5a66" };
+        if (level < 30) return { name: "Ascendente", color: "#2e8b57", bg: "#0f331f" };
+        return { name: "Radiante", color: "#fffdc2", bg: "#5a5932" };
+    }
 
     function getTodayString() {
         const d = new Date();
@@ -186,18 +234,56 @@
     }
 
     function saveData() {
-        localStorage.setItem('detoxDataV3', JSON.stringify(userData));
+        localStorage.setItem('detoxDataV4', JSON.stringify(userData));
         updateUI();
     }
 
+    // Calcular días de racha
+    function getStreakDays(lastDateStamp) {
+        const now = new Date().getTime();
+        return Math.floor(Math.abs(now - lastDateStamp) / (1000 * 60 * 60 * 24));
+    }
+
+    // Inyección de XP Pasiva diaria
+    function checkPassiveXP() {
+        const today = getTodayString();
+        if (!userData.lastPassiveCheck) {
+            userData.lastPassiveCheck = today;
+            saveData();
+            return;
+        }
+
+        if (userData.lastPassiveCheck !== today) {
+            let addedXP = 0;
+            if (getStreakDays(userData.lastPornRelapse) > 0) addedXP += PASSIVE_XP_PER_STREAK;
+            if (getStreakDays(userData.lastMastRelapse) > 0) addedXP += PASSIVE_XP_PER_STREAK;
+
+            if (addedXP > 0) {
+                userData.lastPassiveCheck = today;
+                addXP(addedXP); 
+            } else {
+                userData.lastPassiveCheck = today;
+                saveData();
+            }
+        }
+    }
+
     function addXP(amount) {
+        let oldLevel = userData.level;
         userData.xp = Math.max(0, userData.xp + amount);
         userData.level = Math.floor(userData.xp / XP_PER_LEVEL) + 1;
+        
         if(amount > 0) {
             const today = initTodayHistory();
             userData.history[today].xpGained += amount;
         }
+
         saveData();
+
+        // Chequear si subió de nivel para disparar el popup
+        if (userData.level > oldLevel) {
+            triggerLevelUpModal(userData.level);
+        }
     }
 
     function completeHabit(habitId) {
@@ -209,7 +295,7 @@
     }
 
     function triggerRelapse(type) {
-        if(confirm(`¿Estás seguro de registrar una recaída de ${type === 'porn' ? 'Pornografía' : 'Masturbación'}? Vas a perder un nivel.`)) {
+        if(confirm(`¿Registrar recaída de ${type === 'porn' ? 'Pornografía' : 'Masturbación'}? Vas a perder un nivel y tu racha vuelve a cero.`)) {
             const now = new Date().getTime();
             if (type === 'porn') userData.lastPornRelapse = now;
             if (type === 'mast') userData.lastMastRelapse = now;
@@ -220,9 +306,9 @@
         }
     }
 
-    // Funciones del Gestor de Hábitos
-    function toggleEditMode() {
-        const panel = document.getElementById('editHabitsPanel');
+    // UI Toggles y Ediciones
+    function togglePanel(panelId) {
+        const panel = document.getElementById(panelId);
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     }
 
@@ -230,94 +316,142 @@
         const input = document.getElementById('newHabitInput');
         const name = input.value.trim();
         if (name === '') return;
-        
-        const newId = 'habit_' + Date.now();
-        userData.customHabits.push({ id: newId, name: name });
-        input.value = '';
-        saveData();
+        userData.customHabits.push({ id: 'habit_' + Date.now(), name: name });
+        input.value = ''; saveData();
     }
 
     function deleteHabit(habitId) {
-        if(confirm("¿Borrar este hábito?")) {
+        if(confirm("¿Borrar hábito?")) {
             userData.customHabits = userData.customHabits.filter(h => h.id !== habitId);
             saveData();
         }
     }
 
+    function addNewReward() {
+        const lvlInput = document.getElementById('newRewardLvl');
+        const txtInput = document.getElementById('newRewardText');
+        const lvl = parseInt(lvlInput.value);
+        const txt = txtInput.value.trim();
+        
+        if (!lvl || txt === '') return;
+        
+        // Evitar duplicados de nivel
+        userData.customRewards = userData.customRewards.filter(r => r.level !== lvl);
+        userData.customRewards.push({ level: lvl, text: txt });
+        userData.customRewards.sort((a, b) => a.level - b.level); // Ordenar por nivel
+        
+        lvlInput.value = ''; txtInput.value = ''; saveData();
+    }
+
+    function deleteReward(lvl) {
+        if(confirm("¿Borrar recompensa?")) {
+            userData.customRewards = userData.customRewards.filter(r => r.level !== lvl);
+            saveData();
+        }
+    }
+
+    // Modal Logic
+    function triggerLevelUpModal(newLevel) {
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]); // Vibración de victoria
+        
+        const rank = getRank(newLevel);
+        document.getElementById('modalLvlNumber').innerText = newLevel;
+        
+        const rankDisplay = document.getElementById('modalRankDisplay');
+        rankDisplay.innerText = rank.name;
+        rankDisplay.style.color = rank.color;
+
+        let rewardText = "Mantené la disciplina. Revisa tu panel para futuras recompensas.";
+        // Buscar si hay recompensa exacta para este nivel
+        const exactReward = userData.customRewards.find(r => r.level === newLevel);
+        if(exactReward) rewardText = exactReward.text;
+
+        document.getElementById('modalRewardText').innerText = rewardText;
+        document.getElementById('levelUpModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('levelUpModal').style.display = 'none';
+    }
+
+    // Renderizar Interfaz
     function updateUI() {
         document.getElementById('levelDisplay').innerText = userData.level;
         document.getElementById('xpDisplay').innerText = userData.xp;
         const xpPercentage = ((userData.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
         document.getElementById('xpBar').style.width = xpPercentage + '%';
 
-        // Buscar recompensa exacta o la máxima disponible
-        let currentLevel = userData.level;
-        while(currentLevel > 0 && !rewardsMap[currentLevel]) { currentLevel--; }
-        document.getElementById('rewardDisplay').innerText = rewardsMap[currentLevel] || "Seguí sumando XP.";
+        // Actualizar Rango
+        const rank = getRank(userData.level);
+        const badge = document.getElementById('rankBadge');
+        badge.innerText = rank.name;
+        badge.style.backgroundColor = rank.bg;
+        badge.style.color = rank.color;
 
-        const now = new Date().getTime();
-        const calcDays = (lastDate) => Math.floor(Math.abs(now - lastDate) / (1000 * 60 * 60 * 24));
-        
-        document.getElementById('streakP').innerText = calcDays(userData.lastPornRelapse);
-        document.getElementById('streakM').innerText = calcDays(userData.lastMastRelapse);
+        // Buscar recompensa máxima desbloqueada
+        let currentReward = "Seguí sumando XP para tu primera recompensa.";
+        let highestLvl = 0;
+        userData.customRewards.forEach(r => {
+            if (r.level <= userData.level && r.level > highestLvl) {
+                highestLvl = r.level;
+                currentReward = r.text;
+            }
+        });
+        document.getElementById('rewardDisplay').innerText = currentReward;
 
-        // Renderizar lista principal de hábitos
+        document.getElementById('streakP').innerText = getStreakDays(userData.lastPornRelapse);
+        document.getElementById('streakM').innerText = getStreakDays(userData.lastMastRelapse);
+
+        // Render Hábitos
         const habitList = document.getElementById('habitList');
         const editHabitList = document.getElementById('editHabitList');
-        habitList.innerHTML = '';
-        editHabitList.innerHTML = '';
+        habitList.innerHTML = ''; editHabitList.innerHTML = '';
         const todayStr = new Date().toDateString();
 
         userData.customHabits.forEach(habit => {
-            // Render Vista Principal
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
-            const liMain = document.createElement('li');
-            liMain.className = 'habit-item';
-            liMain.innerHTML = `
-                <span>${habit.name}</span>
-                <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}')">
-                    ${isCompleted ? '✓ Listo' : '+ Hacer'}
-                </button>
-            `;
-            habitList.appendChild(liMain);
-
-            // Render Vista Edición
-            const liEdit = document.createElement('li');
-            liEdit.className = 'habit-item';
-            liEdit.innerHTML = `
-                <span>${habit.name}</span>
-                <button class="btn-del" onclick="deleteHabit('${habit.id}')">✖</button>
-            `;
-            editHabitList.appendChild(liEdit);
+            habitList.innerHTML += `
+                <li class="list-item">
+                    <span>${habit.name}</span>
+                    <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}')">
+                        ${isCompleted ? '✓ Listo' : '+ Hacer'}
+                    </button>
+                </li>`;
+            editHabitList.innerHTML += `
+                <li class="list-item">
+                    <span>${habit.name}</span>
+                    <button class="btn-del" onclick="deleteHabit('${habit.id}')">✖</button>
+                </li>`;
         });
 
-        updateChart();
-        updateCalendar();
+        // Render Recompensas Editables
+        const editRewardList = document.getElementById('editRewardList');
+        editRewardList.innerHTML = '';
+        userData.customRewards.forEach(reward => {
+            editRewardList.innerHTML += `
+                <li class="list-item">
+                    <span><strong>Lvl ${reward.level}:</strong> ${reward.text}</span>
+                    <button class="btn-del" onclick="deleteReward(${reward.level})">✖</button>
+                </li>`;
+        });
+
+        updateChart(); updateCalendar();
     }
 
     function updateChart() {
         const ctx = document.getElementById('progressChart').getContext('2d');
         const labels = []; const data = [];
-        
         for(let i = 6; i >= 0; i--) {
             const d = new Date(); d.setDate(d.getDate() - i);
             const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             labels.push(`${d.getDate()}/${d.getMonth()+1}`);
             data.push(userData.history[dateStr] ? userData.history[dateStr].xpGained : 0);
         }
-
         if(chartInstance) chartInstance.destroy();
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#30d158', borderRadius: 4 }] },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: { 
-                    y: { beginAtZero: true, grid: { color: '#2c2c2e' }, ticks: { color: '#8e8e93', stepSize: 15 } }, 
-                    x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 } } } 
-                },
-                plugins: { legend: { display: false } }
-            }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#2c2c2e' }, ticks: { color: '#8e8e93', stepSize: 20 } }, x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
         });
     }
 
@@ -325,7 +459,6 @@
         const cal = document.getElementById('calendarGrid'); cal.innerHTML = '';
         const date = new Date(); const year = date.getFullYear(); const month = date.getMonth();
         const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-
         for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`;
         for(let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -339,6 +472,8 @@
         }
     }
 
+    // Inicializar todo al abrir la app
+    checkPassiveXP();
     updateUI();
 </script>
 
