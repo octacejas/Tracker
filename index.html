@@ -6,6 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Detox OS">
+    
+    <!-- PONÉ EL NOMBRE DE TU IMAGEN ACÁ (EJ: icono.png) -->
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/150">
+    
     <title>Dopamine Detox OS</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,6 +29,9 @@
         .container { max-width: 100%; margin: 20px auto; padding-bottom: 30px; }
         .panel { background-color: var(--panel-bg); padding: 18px; border-radius: 14px; margin-bottom: 15px; }
         h2, h3 { margin-top: 0; font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .header-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .profile-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
         
         .level-box { background-color: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; position: relative;}
         .rank-badge { position: absolute; top: 10px; right: 10px; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px;}
@@ -53,7 +60,7 @@
         
         .edit-panel { display: none; background-color: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
         .edit-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="text"], input[type="number"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
+        input[type="text"], input[type="number"], input[type="url"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
         
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .chart-container { position: relative; height: 200px; width: 100%; }
@@ -66,7 +73,6 @@
         
         .small-text { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
 
-        /* Estilos del Modal Pop-up */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: #1c1c1e; border: 1px solid var(--border); padding: 30px 20px; border-radius: 20px; text-align: center; width: 85%; max-width: 350px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -79,7 +85,6 @@
 <body>
 
 <div class="container">
-    <!-- Modal Level Up -->
     <div id="levelUpModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">¡NIVEL ALCANZADO!</div>
@@ -87,11 +92,31 @@
             <div id="modalRankDisplay" class="modal-rank"></div>
             <div class="small-text">RECOMPENSA DESBLOQUEADA</div>
             <div id="modalRewardText" class="modal-reward"></div>
-            <button class="btn-modal" onclick="closeModal()">Seguir farmeando</button>
+            <button class="btn-modal" onclick="closeModal()">Seguir progresando</button>
         </div>
     </div>
 
     <div class="panel">
+        <div class="header-profile">
+            <img id="userAvatar" src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
+            <div style="flex: 1;">
+                <div class="small-text">SISTEMA ACTIVO</div>
+                <div style="font-weight: bold; font-size: 1.2rem; margin-top: 2px;">Octavio</div>
+            </div>
+            <button class="btn-icon" onclick="togglePanel('globalSettingsPanel')">⚙️</button>
+        </div>
+
+        <!-- Panel de Ajustes Globales -->
+        <div id="globalSettingsPanel" class="edit-panel">
+            <div class="small-text" style="margin-bottom: 8px;">Nombres de los contadores</div>
+            <div class="edit-input-group" style="flex-direction: column;">
+                <input type="text" id="labelVisualInput" placeholder="Nombre Racha 1 (Ej: Visual)">
+                <input type="text" id="labelFisicaInput" placeholder="Nombre Racha 2 (Ej: Física)">
+                <button class="btn-add" onclick="saveSettings()">Guardar Textos</button>
+            </div>
+            <button class="btn-danger" style="margin-top: 10px;" onclick="togglePanel('globalSettingsPanel')">Cerrar Ajustes</button>
+        </div>
+
         <div class="level-box">
             <div id="rankBadge" class="rank-badge"></div>
             <div class="small-text">NIVEL ACTUAL</div>
@@ -101,13 +126,13 @@
         </div>
         <div class="streaks-grid">
             <div class="stat-box">
-                <div class="small-text">RACHA PORN</div>
-                <div class="number-display streak-p-color" id="streakP">0</div>
+                <div class="small-text" id="labelVisualDisplay">RACHA VISUAL</div>
+                <div class="number-display streak-p-color" id="streakVisual">0</div>
                 <div class="small-text" style="text-transform: none;">días</div>
             </div>
             <div class="stat-box">
-                <div class="small-text">RACHA MAST</div>
-                <div class="number-display streak-m-color" id="streakM">0</div>
+                <div class="small-text" id="labelFisicaDisplay">RACHA FÍSICA</div>
+                <div class="number-display streak-m-color" id="streakFisica">0</div>
                 <div class="small-text" style="text-transform: none;">días</div>
             </div>
         </div>
@@ -121,7 +146,13 @@
         </h3>
         
         <div id="editRewardsPanel" class="edit-panel">
-            <div class="small-text" style="margin-bottom: 8px;">Agregar recompensa</div>
+            <div class="small-text" style="margin-bottom: 8px;">Configurar Foto de Perfil</div>
+            <div class="edit-input-group">
+                <input type="text" id="newAvatarUrl" placeholder="Link de internet o nombre de archivo (Ej: mifoto.jpg)">
+                <button class="btn-add" onclick="updateAvatar()">Actualizar</button>
+            </div>
+            
+            <div class="small-text" style="margin-bottom: 8px; margin-top: 15px;">Agregar recompensa</div>
             <div class="edit-input-group" style="flex-direction: column;">
                 <input type="number" id="newRewardLvl" placeholder="Nivel requerido (Ej: 5)">
                 <input type="text" id="newRewardText" placeholder="Ej: Cheat meal post-gym">
@@ -145,7 +176,7 @@
         <div id="editHabitsPanel" class="edit-panel">
             <div class="small-text" style="margin-bottom: 8px;">Agregar nuevo hábito</div>
             <div class="edit-input-group">
-                <input type="text" id="newHabitInput" placeholder="Ej: Leer 10 páginas...">
+                <input type="text" id="newHabitInput" placeholder="Ej: Protocolo Visual Ok...">
                 <button class="btn-add" onclick="addNewHabit()">Sumar</button>
             </div>
             <div class="small-text" style="margin-bottom: 8px;">Tus Hábitos Actuales</div>
@@ -172,21 +203,22 @@
     </div>
 
     <div class="panel" style="border: 1px solid rgba(255, 69, 58, 0.3);">
-        <h3 style="color: var(--danger);">⚠️ Zona de Peligro (-1 Nivel)</h3>
-        <button class="btn-danger" onclick="triggerRelapse('porn')">Recaída: Pornografía</button>
-        <button class="btn-danger" onclick="triggerRelapse('mast')">Recaída: Masturbación</button>
+        <h3 style="color: var(--danger);">⚠️ Botones de Reinicio (-1 Nivel)</h3>
+        <button class="btn-danger" id="btnVisualRelapse" onclick="triggerRelapse('visual')">Alerta: Reiniciar Racha Visual</button>
+        <button class="btn-danger" id="btnFisicaRelapse" onclick="triggerRelapse('fisica')">Alerta: Reiniciar Racha Física</button>
     </div>
 </div>
 
 <script>
     const XP_PER_LEVEL = 100;
     const HABIT_XP = 15;
-    const PASSIVE_XP_PER_STREAK = 10; // 10 por porn, 10 por mast = 20 XP al día si estás limpio
 
     const defaultHabits = [
         { id: 'gym', name: 'Gimnasio / Fuerza' },
         { id: 'music', name: 'Producir Música' },
-        { id: 'sleep', name: 'Dormir 8 hs' }
+        { id: 'sleep', name: 'Dormir 8 hs' },
+        { id: 'racha_v', name: 'Racha Visual Intacta' },
+        { id: 'racha_f', name: 'Racha Física Intacta' }
     ];
 
     const defaultRewards = [
@@ -196,21 +228,30 @@
         { level: 10, text: "Día libre absoluto. Dominaste el sistema." }
     ];
 
-    let userData = JSON.parse(localStorage.getItem('detoxDataV4')) || {
+    let userData = JSON.parse(localStorage.getItem('detoxDataFinal')) || {
         xp: 0,
         level: 1,
-        lastPornRelapse: new Date().setHours(0,0,0,0),
-        lastMastRelapse: new Date().setHours(0,0,0,0),
-        lastPassiveCheck: "", 
+        lastVisualRelapse: new Date().setHours(0,0,0,0),
+        lastFisicaRelapse: new Date().setHours(0,0,0,0),
         completedHabits: {}, 
         history: {},
         customHabits: defaultHabits,
-        customRewards: defaultRewards
+        customRewards: defaultRewards,
+        avatarUrl: "https://via.placeholder.com/150",
+        settings: {
+            labelVisual: "RACHA VISUAL",
+            labelFisica: "RACHA FÍSICA"
+        }
     };
+
+    // Parche por si venís de la versión anterior y no tenías 'settings' creado
+    if (!userData.settings) {
+        userData.settings = { labelVisual: "RACHA VISUAL", labelFisica: "RACHA FÍSICA" };
+        saveData();
+    }
 
     let chartInstance = null;
 
-    // Sistema de Rangos 
     function getRank(level) {
         if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "#2a2a2a" };
         if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "#4a2e12" };
@@ -234,38 +275,13 @@
     }
 
     function saveData() {
-        localStorage.setItem('detoxDataV4', JSON.stringify(userData));
+        localStorage.setItem('detoxDataFinal', JSON.stringify(userData));
         updateUI();
     }
 
-    // Calcular días de racha
     function getStreakDays(lastDateStamp) {
         const now = new Date().getTime();
         return Math.floor(Math.abs(now - lastDateStamp) / (1000 * 60 * 60 * 24));
-    }
-
-    // Inyección de XP Pasiva diaria
-    function checkPassiveXP() {
-        const today = getTodayString();
-        if (!userData.lastPassiveCheck) {
-            userData.lastPassiveCheck = today;
-            saveData();
-            return;
-        }
-
-        if (userData.lastPassiveCheck !== today) {
-            let addedXP = 0;
-            if (getStreakDays(userData.lastPornRelapse) > 0) addedXP += PASSIVE_XP_PER_STREAK;
-            if (getStreakDays(userData.lastMastRelapse) > 0) addedXP += PASSIVE_XP_PER_STREAK;
-
-            if (addedXP > 0) {
-                userData.lastPassiveCheck = today;
-                addXP(addedXP); 
-            } else {
-                userData.lastPassiveCheck = today;
-                saveData();
-            }
-        }
     }
 
     function addXP(amount) {
@@ -280,7 +296,6 @@
 
         saveData();
 
-        // Chequear si subió de nivel para disparar el popup
         if (userData.level > oldLevel) {
             triggerLevelUpModal(userData.level);
         }
@@ -295,10 +310,11 @@
     }
 
     function triggerRelapse(type) {
-        if(confirm(`¿Registrar recaída de ${type === 'porn' ? 'Pornografía' : 'Masturbación'}? Vas a perder un nivel y tu racha vuelve a cero.`)) {
+        const label = type === 'visual' ? userData.settings.labelVisual : userData.settings.labelFisica;
+        if(confirm(`¿Estás seguro de registrar una alerta en ${label}? Vas a perder un nivel y tu contador vuelve a cero.`)) {
             const now = new Date().getTime();
-            if (type === 'porn') userData.lastPornRelapse = now;
-            if (type === 'mast') userData.lastMastRelapse = now;
+            if (type === 'visual') userData.lastVisualRelapse = now;
+            if (type === 'fisica') userData.lastFisicaRelapse = now;
             const today = initTodayHistory();
             userData.history[today].relapsed = true;
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -306,10 +322,29 @@
         }
     }
 
-    // UI Toggles y Ediciones
     function togglePanel(panelId) {
         const panel = document.getElementById(panelId);
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function saveSettings() {
+        const vInput = document.getElementById('labelVisualInput').value.trim();
+        const fInput = document.getElementById('labelFisicaInput').value.trim();
+        
+        if(vInput !== '') userData.settings.labelVisual = vInput;
+        if(fInput !== '') userData.settings.labelFisica = fInput;
+        
+        saveData();
+        togglePanel('globalSettingsPanel');
+    }
+
+    function updateAvatar() {
+        const input = document.getElementById('newAvatarUrl');
+        if(input.value.trim() !== '') {
+            userData.avatarUrl = input.value.trim();
+            saveData();
+            input.value = '';
+        }
     }
 
     function addNewHabit() {
@@ -335,10 +370,9 @@
         
         if (!lvl || txt === '') return;
         
-        // Evitar duplicados de nivel
         userData.customRewards = userData.customRewards.filter(r => r.level !== lvl);
         userData.customRewards.push({ level: lvl, text: txt });
-        userData.customRewards.sort((a, b) => a.level - b.level); // Ordenar por nivel
+        userData.customRewards.sort((a, b) => a.level - b.level); 
         
         lvlInput.value = ''; txtInput.value = ''; saveData();
     }
@@ -350,9 +384,8 @@
         }
     }
 
-    // Modal Logic
     function triggerLevelUpModal(newLevel) {
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]); // Vibración de victoria
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
         
         const rank = getRank(newLevel);
         document.getElementById('modalLvlNumber').innerText = newLevel;
@@ -362,7 +395,6 @@
         rankDisplay.style.color = rank.color;
 
         let rewardText = "Mantené la disciplina. Revisa tu panel para futuras recompensas.";
-        // Buscar si hay recompensa exacta para este nivel
         const exactReward = userData.customRewards.find(r => r.level === newLevel);
         if(exactReward) rewardText = exactReward.text;
 
@@ -374,21 +406,27 @@
         document.getElementById('levelUpModal').style.display = 'none';
     }
 
-    // Renderizar Interfaz
     function updateUI() {
+        document.getElementById('userAvatar').src = userData.avatarUrl;
+
+        // Actualizar textos configurables
+        document.getElementById('labelVisualDisplay').innerText = userData.settings.labelVisual.toUpperCase();
+        document.getElementById('labelFisicaDisplay').innerText = userData.settings.labelFisica.toUpperCase();
+        
+        document.getElementById('btnVisualRelapse').innerText = "Alerta: Reiniciar " + userData.settings.labelVisual;
+        document.getElementById('btnFisicaRelapse').innerText = "Alerta: Reiniciar " + userData.settings.labelFisica;
+
         document.getElementById('levelDisplay').innerText = userData.level;
         document.getElementById('xpDisplay').innerText = userData.xp;
         const xpPercentage = ((userData.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
         document.getElementById('xpBar').style.width = xpPercentage + '%';
 
-        // Actualizar Rango
         const rank = getRank(userData.level);
         const badge = document.getElementById('rankBadge');
         badge.innerText = rank.name;
         badge.style.backgroundColor = rank.bg;
         badge.style.color = rank.color;
 
-        // Buscar recompensa máxima desbloqueada
         let currentReward = "Seguí sumando XP para tu primera recompensa.";
         let highestLvl = 0;
         userData.customRewards.forEach(r => {
@@ -399,10 +437,9 @@
         });
         document.getElementById('rewardDisplay').innerText = currentReward;
 
-        document.getElementById('streakP').innerText = getStreakDays(userData.lastPornRelapse);
-        document.getElementById('streakM').innerText = getStreakDays(userData.lastMastRelapse);
+        document.getElementById('streakVisual').innerText = getStreakDays(userData.lastVisualRelapse);
+        document.getElementById('streakFisica').innerText = getStreakDays(userData.lastFisicaRelapse);
 
-        // Render Hábitos
         const habitList = document.getElementById('habitList');
         const editHabitList = document.getElementById('editHabitList');
         habitList.innerHTML = ''; editHabitList.innerHTML = '';
@@ -424,7 +461,6 @@
                 </li>`;
         });
 
-        // Render Recompensas Editables
         const editRewardList = document.getElementById('editRewardList');
         editRewardList.innerHTML = '';
         userData.customRewards.forEach(reward => {
@@ -472,8 +508,6 @@
         }
     }
 
-    // Inicializar todo al abrir la app
-    checkPassiveXP();
     updateUI();
 </script>
 
