@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tracker">
+    <title>Dopamine Detox OS</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #000000; --panel-bg: #1c1c1e; --primary: #30d158; 
+            --danger: #ff453a; --warning: #ffd60a; --text: #ffffff; 
+            --text-muted: #8e8e93; --border: #2c2c2e;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color); color: var(--text);
+            margin: 0; padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px;
+            overscroll-behavior-y: none;
+        }
+        .container { max-width: 100%; margin: 20px auto; padding-bottom: 30px; }
+        .panel { background-color: var(--panel-bg); padding: 18px; border-radius: 14px; margin-bottom: 15px; }
+        h2, h3 { margin-top: 0; font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .level-box { background-color: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .streaks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+        .stat-box { background-color: #2c2c2e; padding: 12px; border-radius: 12px; }
+        .number-display { font-size: 2.2rem; font-weight: bold; margin: 5px 0; }
+        .level-color { color: var(--primary); font-size: 2.8rem;}
+        .streak-p-color { color: #bf5af2; }
+        .streak-m-color { color: #64d2ff; }
+        
+        .xp-bar-container { background-color: #000; border-radius: 8px; height: 12px; overflow: hidden; margin-top: 10px; }
+        .xp-bar { height: 100%; background-color: var(--primary); width: 0%; transition: width 0.5s ease; }
+        
+        .habit-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; margin:0;}
+        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #2c2c2e; border-radius: 12px; font-size: 0.95rem; }
+        
+        button { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.1s; min-height: 44px; }
+        button:active { transform: scale(0.95); }
+        .btn-add { background-color: var(--primary); color: #000; padding: 0 16px; }
+        .btn-add:disabled { background-color: #333; color: #888; }
+        .btn-danger { background-color: rgba(255, 69, 58, 0.2); color: var(--danger); border: 1px solid var(--danger); width: 100%; font-size: 1rem; margin-top: 10px; }
+        .btn-icon { background: none; color: var(--primary); font-size: 1.2rem; min-height: auto; padding: 5px; }
+        .btn-del { background-color: transparent; color: var(--danger); font-size: 1.2rem; padding: 0 10px; }
+        
+        .reward-box { background-color: #2c2c2e; border-left: 4px solid var(--warning); padding: 12px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; line-height: 1.4;}
+        
+        /* Edit Habits Section */
+        #editHabitsPanel { display: none; background-color: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .edit-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="text"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
+        
+        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .chart-container { position: relative; height: 200px; width: 100%; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+        .cal-day { background-color: #2c2c2e; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; }
+        .cal-day.success { background-color: rgba(48, 209, 88, 0.2); border: 1px solid var(--primary); color: var(--primary); }
+        .cal-day.fail { background-color: rgba(255, 69, 58, 0.2); border: 1px solid var(--danger); color: var(--danger); }
+        .cal-header { text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; }
+        
+        .small-text { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="panel">
+        <div class="level-box">
+            <div class="small-text">NIVEL ACTUAL</div>
+            <div class="number-display level-color" id="levelDisplay">1</div>
+            <div class="small-text" style="text-transform: none;">XP Total: <span id="xpDisplay">0</span></div>
+            <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        </div>
+        <div class="streaks-grid">
+            <div class="stat-box">
+                <div class="small-text">RACHA PORN</div>
+                <div class="number-display streak-p-color" id="streakP">0</div>
+                <div class="small-text" style="text-transform: none;">días</div>
+            </div>
+            <div class="stat-box">
+                <div class="small-text">RACHA MAST</div>
+                <div class="number-display streak-m-color" id="streakM">0</div>
+                <div class="small-text" style="text-transform: none;">días</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>🏆 Recompensa de Nivel</h3>
+        <div id="rewardDisplay" class="reward-box"></div>
+    </div>
+
+    <!-- Panel de Hábitos Diarios -->
+    <div class="panel">
+        <h3>
+            <span>📋 Hábitos Diarios (+15 XP)</span>
+            <button class="btn-icon" onclick="toggleEditMode()">⚙️</button>
+        </h3>
+        
+        <!-- Zona oculta para editar -->
+        <div id="editHabitsPanel">
+            <div class="small-text" style="margin-bottom: 8px;">Agregar nuevo hábito</div>
+            <div class="edit-input-group">
+                <input type="text" id="newHabitInput" placeholder="Ej: Leer 10 páginas...">
+                <button class="btn-add" onclick="addNewHabit()">Sumar</button>
+            </div>
+            <div class="small-text" style="margin-bottom: 8px;">Tus Hábitos Actuales</div>
+            <ul class="habit-list" id="editHabitList"></ul>
+            <button class="btn-danger" style="margin-top: 15px;" onclick="toggleEditMode()">Cerrar Edición</button>
+        </div>
+
+        <ul class="habit-list" id="habitList"></ul>
+    </div>
+
+    <div class="panel charts-grid">
+        <div>
+            <h3>📈 Análisis de Disciplina (7 días)</h3>
+            <div class="chart-container"><canvas id="progressChart"></canvas></div>
+        </div>
+        <div>
+            <h3>📅 Calendario</h3>
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">
+                <div class="cal-header">Do</div><div class="cal-header">Lu</div><div class="cal-header">Ma</div>
+                <div class="cal-header">Mi</div><div class="cal-header">Ju</div><div class="cal-header">Vi</div><div class="cal-header">Sa</div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <div class="panel" style="border: 1px solid rgba(255, 69, 58, 0.3);">
+        <h3 style="color: var(--danger);">⚠️ Zona de Peligro (-1 Nivel)</h3>
+        <button class="btn-danger" onclick="triggerRelapse('porn')">Recaída: Pornografía</button>
+        <button class="btn-danger" onclick="triggerRelapse('mast')">Recaída: Masturbación</button>
+    </div>
+</div>
+
+<script>
+    const XP_PER_LEVEL = 100;
+    const HABIT_XP = 15;
+    
+    // Podés modificar estos textos directo acá si querés cambiar las recompensas
+    const rewardsMap = {
+        1: "20 minutos de música y un video de autos.",
+        2: "Sesión inmersiva de música (Kanye, Carti, Opium) sin celular.",
+        3: "Hora libre para viciar GTA o Football Life sin culpa.",
+        4: "Día de Cheat Meal post-gym.",
+        5: "Salida o cena especial sin uso de pantallas.",
+        6: "Permiso para comprar un accesorio de gym o algo personal.",
+        10: "Día completo de ocio estructurado. Dominaste el sistema."
+    };
+
+    const defaultHabits = [
+        { id: 'gym', name: 'Gimnasio / Ejercicio' },
+        { id: 'music', name: 'Producir Música' },
+        { id: 'sleep', name: 'Dormir 8 hs' },
+        { id: 'journal', name: 'Gua Sha & Journal' }
+    ];
+
+    let userData = JSON.parse(localStorage.getItem('detoxDataV3')) || {
+        xp: 0,
+        level: 1,
+        lastPornRelapse: new Date().setHours(0,0,0,0),
+        lastMastRelapse: new Date().setHours(0,0,0,0),
+        completedHabits: {}, 
+        history: {},
+        customHabits: defaultHabits // Nueva propiedad para guardar tus hábitos
+    };
+
+    let chartInstance = null;
+
+    function getTodayString() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function initTodayHistory() {
+        const today = getTodayString();
+        if (!userData.history[today]) { userData.history[today] = { xpGained: 0, relapsed: false }; }
+        return today;
+    }
+
+    function saveData() {
+        localStorage.setItem('detoxDataV3', JSON.stringify(userData));
+        updateUI();
+    }
+
+    function addXP(amount) {
+        userData.xp = Math.max(0, userData.xp + amount);
+        userData.level = Math.floor(userData.xp / XP_PER_LEVEL) + 1;
+        if(amount > 0) {
+            const today = initTodayHistory();
+            userData.history[today].xpGained += amount;
+        }
+        saveData();
+    }
+
+    function completeHabit(habitId) {
+        const today = new Date().toDateString();
+        if (userData.completedHabits[habitId] === today) return;
+        if (navigator.vibrate) navigator.vibrate(50);
+        userData.completedHabits[habitId] = today;
+        addXP(HABIT_XP);
+    }
+
+    function triggerRelapse(type) {
+        if(confirm(`¿Estás seguro de registrar una recaída de ${type === 'porn' ? 'Pornografía' : 'Masturbación'}? Vas a perder un nivel.`)) {
+            const now = new Date().getTime();
+            if (type === 'porn') userData.lastPornRelapse = now;
+            if (type === 'mast') userData.lastMastRelapse = now;
+            const today = initTodayHistory();
+            userData.history[today].relapsed = true;
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            addXP(-XP_PER_LEVEL);
+        }
+    }
+
+    // Funciones del Gestor de Hábitos
+    function toggleEditMode() {
+        const panel = document.getElementById('editHabitsPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function addNewHabit() {
+        const input = document.getElementById('newHabitInput');
+        const name = input.value.trim();
+        if (name === '') return;
+        
+        const newId = 'habit_' + Date.now();
+        userData.customHabits.push({ id: newId, name: name });
+        input.value = '';
+        saveData();
+    }
+
+    function deleteHabit(habitId) {
+        if(confirm("¿Borrar este hábito?")) {
+            userData.customHabits = userData.customHabits.filter(h => h.id !== habitId);
+            saveData();
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('levelDisplay').innerText = userData.level;
+        document.getElementById('xpDisplay').innerText = userData.xp;
+        const xpPercentage = ((userData.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
+        document.getElementById('xpBar').style.width = xpPercentage + '%';
+
+        // Buscar recompensa exacta o la máxima disponible
+        let currentLevel = userData.level;
+        while(currentLevel > 0 && !rewardsMap[currentLevel]) { currentLevel--; }
+        document.getElementById('rewardDisplay').innerText = rewardsMap[currentLevel] || "Seguí sumando XP.";
+
+        const now = new Date().getTime();
+        const calcDays = (lastDate) => Math.floor(Math.abs(now - lastDate) / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('streakP').innerText = calcDays(userData.lastPornRelapse);
+        document.getElementById('streakM').innerText = calcDays(userData.lastMastRelapse);
+
+        // Renderizar lista principal de hábitos
+        const habitList = document.getElementById('habitList');
+        const editHabitList = document.getElementById('editHabitList');
+        habitList.innerHTML = '';
+        editHabitList.innerHTML = '';
+        const todayStr = new Date().toDateString();
+
+        userData.customHabits.forEach(habit => {
+            // Render Vista Principal
+            const isCompleted = userData.completedHabits[habit.id] === todayStr;
+            const liMain = document.createElement('li');
+            liMain.className = 'habit-item';
+            liMain.innerHTML = `
+                <span>${habit.name}</span>
+                <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}')">
+                    ${isCompleted ? '✓ Listo' : '+ Hacer'}
+                </button>
+            `;
+            habitList.appendChild(liMain);
+
+            // Render Vista Edición
+            const liEdit = document.createElement('li');
+            liEdit.className = 'habit-item';
+            liEdit.innerHTML = `
+                <span>${habit.name}</span>
+                <button class="btn-del" onclick="deleteHabit('${habit.id}')">✖</button>
+            `;
+            editHabitList.appendChild(liEdit);
+        });
+
+        updateChart();
+        updateCalendar();
+    }
+
+    function updateChart() {
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const labels = []; const data = [];
+        
+        for(let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            labels.push(`${d.getDate()}/${d.getMonth()+1}`);
+            data.push(userData.history[dateStr] ? userData.history[dateStr].xpGained : 0);
+        }
+
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#30d158', borderRadius: 4 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#2c2c2e' }, ticks: { color: '#8e8e93', stepSize: 15 } }, 
+                    x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 } } } 
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function updateCalendar() {
+        const cal = document.getElementById('calendarGrid'); cal.innerHTML = '';
+        const date = new Date(); const year = date.getFullYear(); const month = date.getMonth();
+        const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`;
+        for(let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const history = userData.history[dateStr];
+            let className = 'cal-day';
+            if (history) {
+                if (history.relapsed) className += ' fail';
+                else if (history.xpGained > 0) className += ' success';
+            }
+            cal.innerHTML += `<div class="${className}">${day}</div>`;
+        }
+    }
+
+    updateUI();
+</script>
+
+</body>
+</html>
