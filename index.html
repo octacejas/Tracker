@@ -7,33 +7,37 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Detox OS">
     
-<!-- Fijate cómo le agregamos el ?v=2 justo al final de las comillas -->
-<link rel="apple-touch-icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=2">
-<link rel="icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=2">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=2">
+    <link rel="icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=2">
     
     <title>Dopamine Detox OS</title>
     
+    <!-- Fuentes Estoicas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estética Opium / Dark Glassmorphism */
+        /* Estética Dark Stoic */
         :root {
-            --bg-color: #050505; 
-            --panel-bg: rgba(25, 25, 25, 0.6); 
+            --bg-color: #080808; 
+            --panel-bg: rgba(18, 18, 18, 0.85); 
             --primary: #00ff88; 
-            --danger: #ff2a2a; 
-            --warning: #ffcc00; 
-            --text: #ffffff; 
-            --text-muted: #888888; 
-            --border: rgba(255, 255, 255, 0.08);
+            --danger: #d93838; 
+            --warning: #d4af37; /* Oro antiguo */
+            --text: #f0f0f0; 
+            --text-muted: #777777; 
+            --border: rgba(255, 255, 255, 0.05);
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg-color); color: var(--text);
             margin: 0; padding: 0;
             overscroll-behavior-y: none;
-            overflow-x: hidden; /* CORRECCIÓN: Bloquea el scroll horizontal en toda la app */
+            overflow-x: hidden; 
             width: 100vw;
         }
         
@@ -45,93 +49,119 @@
         
         .panel { 
             background: var(--panel-bg); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 20px; border-radius: 18px; margin-bottom: 15px; 
+            padding: 22px; margin-bottom: 15px; 
             border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 6px; /* Bordes más afilados */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             width: 100%;
         }
         
-        h2, h3 { margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; letter-spacing: -0.5px;}
+        h2, h3 { 
+            font-family: 'Cinzel', serif; /* Tipografía Romana */
+            margin-top: 0; font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            letter-spacing: 1px; color: #ffffff;
+        }
         
         .header-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .profile-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .profile-img { width: 70px; height: 70px; border-radius: 4px; object-fit: cover; border: 1px solid var(--text-muted); }
         .btn-settings { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; padding: 0;}
         
-        .level-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 14px; text-align: center; margin-bottom: 15px; position: relative; border: 1px solid var(--border);}
-        .rank-badge { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px;}
-        .number-display { font-size: 3rem; font-weight: 800; margin: 5px 0; font-variant-numeric: tabular-nums;}
-        .level-color { color: var(--primary); text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);}
+        .level-box { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 4px; text-align: center; margin-bottom: 15px; position: relative; border: 1px solid var(--border);}
+        .rank-badge { position: absolute; top: 12px; right: 12px; font-family: 'Cinzel', serif; font-size: 0.75rem; font-weight: 800; padding: 5px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 2px; border: 1px solid;}
+        .number-display { font-family: 'Cinzel', serif; font-size: 3.5rem; font-weight: 800; margin: 5px 0; line-height: 1;}
+        .level-color { color: var(--primary); text-shadow: 0 0 10px rgba(0, 255, 136, 0.15);}
         
-        .xp-bar-container { background-color: #111; border-radius: 10px; height: 10px; overflow: hidden; margin-top: 15px; border: 1px solid var(--border);}
-        .xp-bar { height: 100%; background: linear-gradient(90deg, #0088ff, var(--primary)); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .xp-bar-container { background-color: #000; border-radius: 2px; height: 6px; overflow: hidden; margin-top: 15px; border: 1px solid var(--border);}
+        .xp-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        .list-container { list-style: none; padding: 0; display: grid; gap: 12px; margin:0;}
+        .list-container { list-style: none; padding: 0; display: grid; gap: 10px; margin:0;}
         .list-item { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 16px; background: rgba(0,0,0,0.3); border-radius: 14px; 
-            border: 1px solid var(--border); font-size: 1rem; font-weight: 500;
-            word-wrap: break-word; overflow-wrap: break-word; /* CORRECCIÓN: Rompe textos largos */
+            padding: 16px; background: rgba(0,0,0,0.4); border-radius: 4px; 
+            border: 1px solid var(--border); font-size: 1rem; font-weight: 600;
+            word-wrap: break-word; overflow-wrap: break-word;
         }
         .streak-info { display: flex; flex-direction: column; flex: 1; min-width: 0; padding-right: 10px; }
-        .streak-days { font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-top: 2px;}
+        .streak-days { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--primary); font-weight: 800; margin-top: 4px; letter-spacing: 1px;}
         
-        button { border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: transform 0.1s; min-height: 44px; font-family: inherit;}
+        button { border: none; border-radius: 4px; cursor: pointer; font-weight: 800; transition: transform 0.1s; min-height: 44px; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;}
         button:active { transform: scale(0.95); }
         .btn-add { background-color: var(--primary); color: #000; padding: 0 18px; white-space: nowrap;}
-        .btn-add:disabled { background-color: #222; color: #555; }
-        .btn-reset { background-color: rgba(255, 42, 42, 0.15); color: var(--danger); border: 1px solid var(--danger); padding: 0 15px; font-size: 0.85rem;}
-        .btn-danger { background-color: var(--danger); color: white; width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
-        .btn-del { background-color: transparent; color: var(--danger); font-size: 1.2rem; padding: 0 10px; }
+        .btn-add:disabled { background-color: #1a1a1a; color: #444; }
+        .btn-reset { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 0 15px;}
+        .btn-danger { background-color: rgba(217, 56, 56, 0.1); color: var(--danger); border: 1px solid var(--danger); width: 100%; padding: 14px; margin-top: 10px; }
+        .btn-icon-small { background: transparent; font-size: 1.2rem; padding: 0 8px; color: var(--text-muted); min-height: auto;}
         
-        .reward-box { background: rgba(0,0,0,0.4); border-left: 4px solid var(--warning); padding: 15px; border-radius: 6px 12px 12px 6px; font-size: 0.95rem; line-height: 1.5; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);}
+        .reward-box { background: rgba(0,0,0,0.4); border-left: 3px solid var(--warning); padding: 15px; font-size: 0.95rem; line-height: 1.6; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); font-style: italic;}
         
         .cal-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .cal-controls button { background: none; color: var(--text); font-size: 1.2rem; min-height: auto; padding: 5px 15px; border: 1px solid var(--border);}
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day { background-color: rgba(0,0,0,0.4); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; font-weight: 600;}
-        .cal-day.success { background-color: rgba(0, 255, 136, 0.15); border: 1px solid var(--primary); color: var(--primary); text-shadow: 0 0 5px rgba(0,255,136,0.5);}
-        .cal-day.fail { background-color: rgba(255, 42, 42, 0.15); border: 1px solid var(--danger); color: var(--danger); }
-        .cal-header { text-align: center; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px;}
+        .cal-day { background-color: rgba(0,0,0,0.6); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 2px; font-size: 0.85rem; font-weight: 600; font-family: 'Cinzel', serif;}
+        .cal-day.success { background-color: rgba(0, 255, 136, 0.1); border: 1px solid var(--primary); color: var(--primary);}
+        .cal-day.fail { background-color: rgba(217, 56, 56, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .cal-header { text-align: center; font-weight: 800; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px; font-family: 'Cinzel', serif;}
         
-        /* CORRECCIÓN: Ajustes estrictos en el Modal de Configuración */
-        .settings-modal { 
+        textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); padding: 15px; font-family: 'Inter', sans-serif; font-size: 0.95rem; border-radius: 4px; resize: vertical; min-height: 120px; outline: none; }
+        textarea:focus { border-color: var(--primary); }
+
+        .settings-modal, .onboarding-modal { 
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
             background: var(--bg-color); z-index: 2000; 
             overflow-y: auto; overflow-x: hidden; 
             padding: max(20px, env(safe-area-inset-top)) 15px 40px 15px; 
             width: 100vw; box-sizing: border-box;
         }
+        .onboarding-modal { z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000;}
+        .onboarding-content { width: 100%; max-width: 400px; text-align: center;}
+        
         .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
         .settings-section { 
-            margin-bottom: 30px; background: var(--panel-bg); padding: 15px; 
-            border-radius: 14px; border: 1px solid var(--border); 
+            margin-bottom: 25px; background: rgba(15,15,15,0.9); padding: 18px; 
+            border-radius: 4px; border: 1px solid var(--border); 
             width: 100%; box-sizing: border-box; overflow-x: hidden;
         }
-        .edit-input-group { 
-            display: flex; gap: 10px; margin-bottom: 10px; width: 100%;
+        .edit-input-group { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; }
+        input[type="text"], input[type="number"] { 
+            flex: 1; padding: 12px; border-radius: 2px; border: 1px solid var(--border); 
+            background: #000; color: white; font-size: 0.95rem; min-width: 0; font-family: 'Inter', sans-serif;
         }
-        input[type="text"], input[type="number"], select { 
-            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
-            background: rgba(0,0,0,0.5); color: white; font-size: 1rem; 
-            min-width: 0; /* CORRECCIÓN: Evita que los campos se salgan de la pantalla */
-        }
+        .file-upload-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; padding: 14px; text-align: center; border-radius: 2px; display: block; width: 100%; margin-bottom: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;}
         input[type="file"] { display: none; }
-        .file-upload-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: white; padding: 12px; text-align: center; border-radius: 10px; display: block; width: 100%; margin-bottom: 10px; font-weight: 600;}
         
-        .small-text { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .small-text { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 800;}
         .chart-container { position: relative; height: 180px; width: 100%; margin-top: 15px;}
+        
+        .action-buttons { display: flex; gap: 5px; }
     </style>
 </head>
 <body>
 
+<!-- ================= PANTALLA DE BIENVENIDA (ONBOARDING) ================= -->
+<div id="onboardingModal" class="onboarding-modal">
+    <div class="onboarding-content">
+        <h2 style="justify-content: center; font-size: 2rem; color: var(--primary);">INICIAR SISTEMA</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Forja tu disciplina. Configura tu perfil para comenzar.</p>
+        
+        <input type="text" id="onboardingName" placeholder="Tu Nombre" style="width: 100%; margin-bottom: 15px; text-align: center;">
+        
+        <label class="file-upload-btn" style="margin-bottom: 30px;">
+            📷 Subir Foto de Perfil (Opcional)
+            <input type="file" accept="image/*" onchange="handleOnboardingImage(event)">
+        </label>
+        
+        <button class="btn-add" style="width: 100%; padding: 15px; font-size: 1rem;" onclick="finishOnboarding()">Entrar</button>
+    </div>
+</div>
+
 <div class="container">
     <div class="panel">
         <div class="header-profile">
-            <img id="userAvatar" src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
+            <img id="userAvatar" src="https://i.postimg.cc/TPM5C68M/stoic.jpg" alt="Avatar" class="profile-img">
             <div style="flex: 1;">
-                <div class="small-text" id="usernameDisplay">SISTEMA ACTIVO</div>
-                <div style="font-weight: 800; font-size: 1.3rem; margin-top: 2px;">Octavio</div>
+                <div class="small-text">OPERADOR</div>
+                <div id="usernameDisplay" style="font-family: 'Cinzel', serif; font-weight: 800; font-size: 1.5rem; margin-top: 2px;">Usuario</div>
             </div>
             <button class="btn-settings" onclick="toggleSettings()">⚙️</button>
         </div>
@@ -140,35 +170,30 @@
             <div id="rankBadge" class="rank-badge"></div>
             <div class="small-text">NIVEL ACTUAL</div>
             <div class="number-display level-color" id="levelDisplay">1</div>
-            <div class="small-text" style="text-transform: none; color: #aaa;">XP Total: <span id="xpDisplay">0</span></div>
+            <div class="small-text" style="color: #666;">XP Total: <span id="xpDisplay">0</span></div>
             <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
         </div>
     </div>
 
-    <!-- Recompensas -->
     <div class="panel">
-        <h3 style="color: var(--warning);">🏆 Recompensa Vigente</h3>
+        <h3 style="color: var(--warning);">🏆 Objetivo Actual</h3>
         <div id="rewardDisplay" class="reward-box"></div>
     </div>
 
-    <!-- Hábitos y Rachas (Unificados) -->
     <div class="panel">
         <h3>📋 Sistema Diario</h3>
-        <ul class="list-container" id="mainList">
-            <!-- Se llena con JS -->
-        </ul>
+        <ul class="list-container" id="mainList"></ul>
     </div>
 
-    <!-- Historial y Análisis -->
     <div class="panel">
-        <h3>📈 Análisis de Disciplina</h3>
+        <h3>📈 Análisis</h3>
         <div class="chart-container"><canvas id="progressChart"></canvas></div>
     </div>
 
     <div class="panel">
         <div class="cal-controls">
             <button onclick="changeMonth(-1)">◀</button>
-            <h3 id="monthYearDisplay" style="margin: 0;">Agosto 2026</h3>
+            <h3 id="monthYearDisplay" style="margin: 0; font-size: 1rem;">Mes Año</h3>
             <button onclick="changeMonth(1)">▶</button>
         </div>
         <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
@@ -177,27 +202,36 @@
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
+    
+    <!-- NUEVO: Panel de Notas -->
+    <div class="panel">
+        <h3>📓 Notas & Visión</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -10px;">Ideas, mejoras futuras o reflexiones del día. Se guarda automático.</p>
+        <textarea id="appNotes" placeholder="Escribe aquí tus ideas..." onchange="saveNotes()"></textarea>
+    </div>
 </div>
 
 <!-- ================= MODAL CENTRAL DE AJUSTES ================= -->
 <div id="settingsModal" class="settings-modal">
     <div class="settings-header">
-        <h2 style="margin:0; font-size: 1.5rem;">Ajustes del Sistema</h2>
+        <h2 style="margin:0; font-size: 1.5rem;">CONFIGURACIÓN</h2>
         <button class="btn-settings" style="font-size: 2rem;" onclick="toggleSettings()">×</button>
     </div>
 
-    <!-- Perfil -->
     <div class="settings-section">
-        <h3 class="small-text">Configuración de Perfil</h3>
+        <h3 class="small-text">Perfil</h3>
+        <div class="edit-input-group">
+            <input type="text" id="editUsername" placeholder="Cambiar Nombre">
+            <button class="btn-add" onclick="updateUsername()">Ok</button>
+        </div>
         <label class="file-upload-btn">
-            📷 Subir Foto desde Galería
+            📷 Cambiar Foto
             <input type="file" accept="image/*" onchange="handleImageUpload(event)">
         </label>
     </div>
 
-    <!-- Rachas Dinámicas -->
     <div class="settings-section">
-        <h3 class="small-text">Tus Rachas Activas (Castigan XP)</h3>
+        <h3 class="small-text">Rachas Activas</h3>
         <div class="edit-input-group">
             <input type="text" id="newStreakEmoji" placeholder="Emoji" style="flex: 0.3;">
             <input type="text" id="newStreakName" placeholder="Nombre">
@@ -206,9 +240,8 @@
         <ul class="list-container" id="settingsStreakList" style="margin-top: 10px;"></ul>
     </div>
 
-    <!-- Hábitos Dinámicos -->
     <div class="settings-section">
-        <h3 class="small-text">Tus Hábitos Diarios (+XP)</h3>
+        <h3 class="small-text">Hábitos Diarios</h3>
         <div class="edit-input-group">
             <input type="text" id="newHabitEmoji" placeholder="Emoji" style="flex: 0.3;">
             <input type="text" id="newHabitName" placeholder="Nombre">
@@ -217,9 +250,8 @@
         <ul class="list-container" id="settingsHabitList" style="margin-top: 10px;"></ul>
     </div>
 
-    <!-- Recompensas -->
     <div class="settings-section">
-        <h3 class="small-text">Árbol de Recompensas</h3>
+        <h3 class="small-text">Recompensas</h3>
         <div class="edit-input-group">
             <input type="number" id="newRewardLvl" placeholder="Lvl" style="flex: 0.3;">
             <input type="text" id="newRewardText" placeholder="Recompensa">
@@ -228,15 +260,13 @@
         <ul class="list-container" id="settingsRewardList" style="margin-top: 10px;"></ul>
     </div>
 
-    <!-- Datos -->
-    <div class="settings-section" style="border-color: var(--primary);">
-        <h3 class="small-text" style="color: var(--primary);">Gestión de Datos (Backup)</h3>
-        <button class="btn-add" style="width: 100%; margin-bottom: 10px;" onclick="exportData()">⬇️ Exportar Datos (Backup)</button>
+    <div class="settings-section" style="border-color: rgba(255,255,255,0.2);">
+        <h3 class="small-text">Base de Datos</h3>
+        <button class="btn-add" style="width: 100%; margin-bottom: 10px; background: #fff; color: #000;" onclick="exportData()">⬇️ Exportar Backup</button>
         <label class="file-upload-btn" style="margin: 0; border-color: var(--warning); color: var(--warning);">
-            ⬆️ Importar Datos JSON
+            ⬆️ Importar Backup JSON
             <input type="file" accept=".json" onchange="importData(event)">
         </label>
-        <div class="small-text" style="margin-top: 8px; text-transform: none; text-align: center;">Cargar un JSON reemplazará todos tus datos actuales.</div>
     </div>
 </div>
 
@@ -244,37 +274,88 @@
     const XP_PER_LEVEL = 100;
     const HABIT_XP = 15;
     
-    let userData = JSON.parse(localStorage.getItem('detoxDataV5')) || {
+    // Usamos una nueva key para la versión Stoic para asegurar que salte el Onboarding
+    let userData = JSON.parse(localStorage.getItem('detoxDataStoic')) || {
+        onboardingDone: false,
+        username: "Usuario",
         installDate: new Date().getTime(),
         xp: 0,
         level: 1,
-        avatarBase64: "https://via.placeholder.com/150",
+        avatarBase64: "https://i.postimg.cc/TPM5C68M/stoic.jpg", // Estatua por defecto
+        notes: "",
         completedHabits: {}, 
         history: {}, 
         customHabits: [
             { id: 'h1', emoji: '🏋️', name: 'Gimnasio / Fuerza' },
             { id: 'h2', emoji: '🎧', name: 'Producir Música' },
-            { id: 'h3', emoji: '😴', name: 'Dormir 8 hs' }
+            { id: 'h3', emoji: '📖', name: 'Lectura / Estudio' }
         ],
         customStreaks: [
-            { id: 's1', emoji: '👁️', name: 'Racha Visual', lastRelapse: new Date().setHours(0,0,0,0) },
-            { id: 's2', emoji: '⚡', name: 'Racha Física', lastRelapse: new Date().setHours(0,0,0,0) }
+            { id: 's1', emoji: '👁️', name: 'Disciplina Visual', lastRelapse: new Date().setHours(0,0,0,0) },
+            { id: 's2', emoji: '⚡', name: 'Disciplina Física', lastRelapse: new Date().setHours(0,0,0,0) }
         ],
         customRewards: [
             { level: 2, text: "20 minutos de música y un video de autos." },
-            { level: 5, text: "Cheat Meal post-entrenamiento." },
-            { level: 10, text: "Día libre absoluto. Dominaste el sistema." }
+            { level: 5, text: "Cheat Meal merecido." },
+            { level: 10, text: "Día libre absoluto. Control total." }
         ]
     };
 
     let chartInstance = null;
     let currentMonthOffset = 0; 
+    let tempOnboardingImg = null;
 
     function saveData() {
-        localStorage.setItem('detoxDataV5', JSON.stringify(userData));
+        localStorage.setItem('detoxDataStoic', JSON.stringify(userData));
         updateUI();
     }
 
+    // ================= ONBOARDING =================
+    function checkOnboarding() {
+        if (!userData.onboardingDone) {
+            document.getElementById('onboardingModal').style.display = 'flex';
+        } else {
+            updateUI();
+        }
+    }
+
+    function handleOnboardingImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            tempOnboardingImg = e.target.result;
+            alert("Foto cargada con éxito.");
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function finishOnboarding() {
+        const nameInput = document.getElementById('onboardingName').value.trim();
+        if (nameInput) userData.username = nameInput;
+        if (tempOnboardingImg) userData.avatarBase64 = tempOnboardingImg;
+        
+        userData.onboardingDone = true;
+        document.getElementById('onboardingModal').style.display = 'none';
+        saveData();
+    }
+
+    // ================= NOTAS & PERFIL =================
+    function saveNotes() {
+        userData.notes = document.getElementById('appNotes').value;
+        saveData();
+    }
+
+    function updateUsername() {
+        const input = document.getElementById('editUsername').value.trim();
+        if (input) {
+            userData.username = input;
+            document.getElementById('editUsername').value = '';
+            saveData();
+        }
+    }
+
+    // ================= LOGICA CORE =================
     function getTodayString() {
         const d = new Date();
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -294,7 +375,6 @@
     function addXP(amount) {
         userData.xp = Math.max(0, userData.xp + amount);
         userData.level = Math.floor(userData.xp / XP_PER_LEVEL) + 1;
-        
         if(amount > 0) {
             const today = initTodayHistory();
             userData.history[today].xpGained += amount;
@@ -314,9 +394,8 @@
         if(confirm(`⚠️ ¿Resetear la racha "${streakName}"? Vas a perder 1 nivel.`)) {
             const now = new Date().getTime();
             const streakIndex = userData.customStreaks.findIndex(s => s.id === streakId);
-            if(streakIndex !== -1) {
-                userData.customStreaks[streakIndex].lastRelapse = now;
-            }
+            if(streakIndex !== -1) userData.customStreaks[streakIndex].lastRelapse = now;
+            
             const today = initTodayHistory();
             userData.history[today].relapsed = true;
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -325,16 +404,17 @@
     }
 
     function getRank(level) {
-        if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "rgba(108,108,108,0.2)" };
-        if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "rgba(205,127,50,0.2)" };
-        if (level < 10) return { name: "Plata", color: "#c0c0c0", bg: "rgba(192,192,192,0.2)" };
-        if (level < 15) return { name: "Oro", color: "#ffd700", bg: "rgba(255,215,0,0.2)" };
-        if (level < 20) return { name: "Platino", color: "#00ced1", bg: "rgba(0,206,209,0.2)" };
-        if (level < 25) return { name: "Diamante", color: "#b9f2ff", bg: "rgba(185,242,255,0.2)" };
-        if (level < 30) return { name: "Ascendente", color: "#2e8b57", bg: "rgba(46,139,87,0.2)" };
-        return { name: "Radiante", color: "#fffdc2", bg: "rgba(255,253,194,0.2)" };
+        if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "transparent", border: "#6c6c6c" };
+        if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "transparent", border: "#cd7f32" };
+        if (level < 10) return { name: "Plata", color: "#c0c0c0", bg: "transparent", border: "#c0c0c0" };
+        if (level < 15) return { name: "Oro", color: "#ffd700", bg: "transparent", border: "#ffd700" };
+        if (level < 20) return { name: "Platino", color: "#00ced1", bg: "transparent", border: "#00ced1" };
+        if (level < 25) return { name: "Diamante", color: "#b9f2ff", bg: "transparent", border: "#b9f2ff" };
+        if (level < 30) return { name: "Ascendente", color: "#2e8b57", bg: "transparent", border: "#2e8b57" };
+        return { name: "Radiante", color: "#fffdc2", bg: "transparent", border: "#fffdc2" };
     }
 
+    // ================= EDICIÓN Y SETTINGS =================
     function toggleSettings() {
         const modal = document.getElementById('settingsModal');
         modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
@@ -351,6 +431,35 @@
             alert("Foto de perfil actualizada.");
         };
         reader.readAsDataURL(file);
+    }
+
+    function editItem(type, id) {
+        if (type === 'habit') {
+            let item = userData.customHabits.find(h => h.id === id);
+            let newName = prompt("Nuevo nombre del hábito:", item.name);
+            let newEmoji = prompt("Nuevo emoji:", item.emoji);
+            if(newName) item.name = newName;
+            if(newEmoji) item.emoji = newEmoji;
+        } else if (type === 'streak') {
+            let item = userData.customStreaks.find(s => s.id === id);
+            let newName = prompt("Nuevo nombre de la racha:", item.name);
+            let newEmoji = prompt("Nuevo emoji:", item.emoji);
+            if(newName) item.name = newName;
+            if(newEmoji) item.emoji = newEmoji;
+        } else if (type === 'reward') {
+            let item = userData.customRewards.find(r => r.level === id);
+            let newText = prompt(`Nueva recompensa para el nivel ${id}:`, item.text);
+            if(newText) item.text = newText;
+        }
+        saveData(); renderSettingsLists();
+    }
+
+    function deleteItem(type, id) {
+        if(!confirm("¿Seguro que querés borrar esto?")) return;
+        if (type === 'habit') userData.customHabits = userData.customHabits.filter(i => i.id !== id);
+        if (type === 'streak') userData.customStreaks = userData.customStreaks.filter(i => i.id !== id);
+        if (type === 'reward') userData.customRewards = userData.customRewards.filter(i => i.level !== id);
+        saveData(); renderSettingsLists();
     }
 
     function addNewHabit() {
@@ -382,14 +491,6 @@
         saveData(); renderSettingsLists();
     }
 
-    function deleteItem(type, id) {
-        if(!confirm("¿Seguro que querés borrar esto?")) return;
-        if (type === 'habit') userData.customHabits = userData.customHabits.filter(i => i.id !== id);
-        if (type === 'streak') userData.customStreaks = userData.customStreaks.filter(i => i.id !== id);
-        if (type === 'reward') userData.customRewards = userData.customRewards.filter(i => i.level !== id);
-        saveData(); renderSettingsLists();
-    }
-
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData));
         const downloadAnchor = document.createElement('a');
@@ -418,25 +519,51 @@
         reader.readAsText(file);
     }
 
+    // ================= RENDER UI =================
     function renderSettingsLists() {
         const hl = document.getElementById('settingsHabitList'); hl.innerHTML = '';
         userData.customHabits.forEach(h => {
-            hl.innerHTML += `<li class="list-item"><span>${h.emoji} ${h.name}</span> <button class="btn-del" onclick="deleteItem('habit', '${h.id}')">✖</button></li>`;
+            hl.innerHTML += `
+                <li class="list-item">
+                    <span>${h.emoji} ${h.name}</span> 
+                    <div class="action-buttons">
+                        <button class="btn-icon-small" onclick="editItem('habit', '${h.id}')">✏️</button>
+                        <button class="btn-del" onclick="deleteItem('habit', '${h.id}')">✖</button>
+                    </div>
+                </li>`;
         });
         const sl = document.getElementById('settingsStreakList'); sl.innerHTML = '';
         userData.customStreaks.forEach(s => {
-            sl.innerHTML += `<li class="list-item"><span>${s.emoji} ${s.name}</span> <button class="btn-del" onclick="deleteItem('streak', '${s.id}')">✖</button></li>`;
+            sl.innerHTML += `
+                <li class="list-item">
+                    <span>${s.emoji} ${s.name}</span> 
+                    <div class="action-buttons">
+                        <button class="btn-icon-small" onclick="editItem('streak', '${s.id}')">✏️</button>
+                        <button class="btn-del" onclick="deleteItem('streak', '${s.id}')">✖</button>
+                    </div>
+                </li>`;
         });
         const rl = document.getElementById('settingsRewardList'); rl.innerHTML = '';
         userData.customRewards.forEach(r => {
-            rl.innerHTML += `<li class="list-item"><span>Lvl ${r.level}: ${r.text}</span> <button class="btn-del" onclick="deleteItem('reward', ${r.level})">✖</button></li>`;
+            rl.innerHTML += `
+                <li class="list-item">
+                    <span>Lvl ${r.level}: ${r.text}</span> 
+                    <div class="action-buttons">
+                        <button class="btn-icon-small" onclick="editItem('reward', ${r.level})">✏️</button>
+                        <button class="btn-del" onclick="deleteItem('reward', ${r.level})">✖</button>
+                    </div>
+                </li>`;
         });
     }
 
     function updateUI() {
         initTodayHistory();
 
+        // Datos del Perfil y Notas
+        document.getElementById('usernameDisplay').innerText = userData.username;
         document.getElementById('userAvatar').src = userData.avatarBase64;
+        document.getElementById('appNotes').value = userData.notes || "";
+
         document.getElementById('levelDisplay').innerText = userData.level;
         document.getElementById('xpDisplay').innerText = userData.xp;
         const xpPercentage = ((userData.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
@@ -447,8 +574,9 @@
         badge.innerText = rank.name;
         badge.style.backgroundColor = rank.bg;
         badge.style.color = rank.color;
+        badge.style.borderColor = rank.border;
 
-        let currentReward = "Farméa XP para tu primera recompensa.";
+        let currentReward = "Forja tu disciplina para la próxima recompensa.";
         let highestLvl = 0;
         userData.customRewards.forEach(r => {
             if (r.level <= userData.level && r.level > highestLvl) {
@@ -466,9 +594,9 @@
                 <li class="list-item" style="border-color: rgba(255,255,255,0.15);">
                     <div class="streak-info">
                         <span>${streak.emoji} ${streak.name}</span>
-                        <span class="streak-days">🔥 ${days} Días</span>
+                        <span class="streak-days">${days} DÍAS INVICTO</span>
                     </div>
-                    <button class="btn-reset" onclick="triggerRelapse('${streak.id}', '${streak.name}')">🔄 Reset</button>
+                    <button class="btn-reset" onclick="triggerRelapse('${streak.id}', '${streak.name}')">RESET</button>
                 </li>`;
         });
 
@@ -498,14 +626,19 @@
             data.push(userData.history[dateStr] ? userData.history[dateStr].xpGained : 0);
         }
         if(chartInstance) chartInstance.destroy();
+        
+        // Estética del gráfico adaptada al dark mode
+        Chart.defaults.color = '#777';
+        Chart.defaults.font.family = 'Inter';
+        
         chartInstance = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#00ff88', borderRadius: 6 }] },
+            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#00ff88', borderRadius: 2 }] },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
                 scales: { 
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888', stepSize: 20 } }, 
-                    x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } } 
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 20 } }, 
+                    x: { grid: { display: false } } 
                 }, 
                 plugins: { legend: { display: false } } 
             }
@@ -558,7 +691,7 @@
         }
     }
 
-    updateUI();
+    checkOnboarding();
 </script>
 
 </body>
