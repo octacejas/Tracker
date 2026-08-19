@@ -6,261 +6,250 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Detox OS">
-    
-    <!-- PONÉ EL NOMBRE DE TU IMAGEN ACÁ (EJ: icono.png) -->
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/150">
-    
     <title>Dopamine Detox OS</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Estética Opium / Dark Glassmorphism */
         :root {
-            --bg-color: #000000; --panel-bg: #1c1c1e; --primary: #30d158; 
-            --danger: #ff453a; --warning: #ffd60a; --text: #ffffff; 
-            --text-muted: #8e8e93; --border: #2c2c2e;
+            --bg-color: #050505; 
+            --panel-bg: rgba(25, 25, 25, 0.6); 
+            --primary: #00ff88; 
+            --danger: #ff2a2a; 
+            --warning: #ffcc00; 
+            --text: #ffffff; 
+            --text-muted: #888888; 
+            --border: rgba(255, 255, 255, 0.08);
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, sans-serif;
             background-color: var(--bg-color); color: var(--text);
             margin: 0; padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px;
             overscroll-behavior-y: none;
         }
-        .container { max-width: 100%; margin: 20px auto; padding-bottom: 30px; }
-        .panel { background-color: var(--panel-bg); padding: 18px; border-radius: 14px; margin-bottom: 15px; }
-        h2, h3 { margin-top: 0; font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
         
+        .container { max-width: 800px; margin: 20px auto; padding-bottom: 40px; }
+        
+        .panel { 
+            background: var(--panel-bg); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 20px; border-radius: 18px; margin-bottom: 15px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2, h3 { margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; letter-spacing: -0.5px;}
+        
+        /* Header y Perfil */
         .header-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .profile-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .profile-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .btn-settings { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
         
-        .level-box { background-color: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; position: relative;}
-        .rank-badge { position: absolute; top: 10px; right: 10px; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px;}
-        .streaks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
-        .stat-box { background-color: #2c2c2e; padding: 12px; border-radius: 12px; }
-        .number-display { font-size: 2.2rem; font-weight: bold; margin: 5px 0; }
-        .level-color { color: var(--primary); font-size: 2.8rem;}
-        .streak-p-color { color: #bf5af2; }
-        .streak-m-color { color: #64d2ff; }
+        /* Level Box */
+        .level-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 14px; text-align: center; margin-bottom: 15px; position: relative; border: 1px solid var(--border);}
+        .rank-badge { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        .number-display { font-size: 3rem; font-weight: 800; margin: 5px 0; font-variant-numeric: tabular-nums;}
+        .level-color { color: var(--primary); text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);}
         
-        .xp-bar-container { background-color: #000; border-radius: 8px; height: 12px; overflow: hidden; margin-top: 10px; }
-        .xp-bar { height: 100%; background-color: var(--primary); width: 0%; transition: width 0.5s ease; }
+        .xp-bar-container { background-color: #111; border-radius: 10px; height: 10px; overflow: hidden; margin-top: 15px; border: 1px solid var(--border);}
+        .xp-bar { height: 100%; background: linear-gradient(90deg, #0088ff, var(--primary)); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        .list-container { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; margin:0;}
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #2c2c2e; border-radius: 12px; font-size: 0.95rem; }
+        /* Listas Mixtas (Hábitos y Rachas) */
+        .list-container { list-style: none; padding: 0; display: grid; gap: 12px; margin:0;}
+        .list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px; background: rgba(0,0,0,0.3); border-radius: 14px; 
+            border: 1px solid var(--border); font-size: 1rem; font-weight: 500;
+        }
+        .streak-info { display: flex; flex-direction: column; }
+        .streak-days { font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-top: 2px;}
         
-        button { border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.1s; min-height: 44px; }
+        /* Botones */
+        button { border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: transform 0.1s; min-height: 44px; font-family: inherit;}
         button:active { transform: scale(0.95); }
-        .btn-add { background-color: var(--primary); color: #000; padding: 0 16px; }
-        .btn-add:disabled { background-color: #333; color: #888; }
-        .btn-danger { background-color: rgba(255, 69, 58, 0.2); color: var(--danger); border: 1px solid var(--danger); width: 100%; font-size: 1rem; margin-top: 10px; }
-        .btn-icon { background: none; color: var(--primary); font-size: 1.2rem; min-height: auto; padding: 5px; }
+        .btn-add { background-color: var(--primary); color: #000; padding: 0 18px; }
+        .btn-add:disabled { background-color: #222; color: #555; }
+        .btn-reset { background-color: rgba(255, 42, 42, 0.15); color: var(--danger); border: 1px solid var(--danger); padding: 0 15px; font-size: 0.85rem;}
+        .btn-danger { background-color: var(--danger); color: white; width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
         .btn-del { background-color: transparent; color: var(--danger); font-size: 1.2rem; padding: 0 10px; }
         
-        .reward-box { background-color: #2c2c2e; border-left: 4px solid var(--warning); padding: 12px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; line-height: 1.4;}
+        .reward-box { background: rgba(0,0,0,0.4); border-left: 4px solid var(--warning); padding: 15px; border-radius: 6px 12px 12px 6px; font-size: 0.95rem; line-height: 1.5; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);}
         
-        .edit-panel { display: none; background-color: #1c1c1e; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .edit-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input[type="text"], input[type="number"], input[type="url"] { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2e; color: white; font-size: 1rem; }
+        /* Calendario Mensual */
+        .cal-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .cal-controls button { background: none; color: var(--text); font-size: 1.2rem; min-height: auto; padding: 5px 15px; border: 1px solid var(--border);}
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day { background-color: rgba(0,0,0,0.4); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; font-weight: 600;}
+        .cal-day.success { background-color: rgba(0, 255, 136, 0.15); border: 1px solid var(--primary); color: var(--primary); text-shadow: 0 0 5px rgba(0,255,136,0.5);}
+        .cal-day.fail { background-color: rgba(255, 42, 42, 0.15); border: 1px solid var(--danger); color: var(--danger); }
+        .cal-header { text-align: center; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px;}
         
-        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .chart-container { position: relative; height: 200px; width: 100%; }
+        /* Settings Modal Centralizado */
+        .settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; overflow-y: auto; padding: env(safe-area-inset-top) 15px 40px 15px; }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
+        .settings-section { margin-bottom: 30px; background: var(--panel-bg); padding: 15px; border-radius: 14px; border: 1px solid var(--border); }
+        .edit-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        input[type="text"], input[type="number"], select { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.5); color: white; font-size: 1rem; }
+        input[type="file"] { display: none; }
+        .file-upload-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: white; padding: 12px; text-align: center; border-radius: 10px; display: block; width: 100%; margin-bottom: 10px; font-weight: 600;}
         
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
-        .cal-day { background-color: #2c2c2e; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85rem; }
-        .cal-day.success { background-color: rgba(48, 209, 88, 0.2); border: 1px solid var(--primary); color: var(--primary); }
-        .cal-day.fail { background-color: rgba(255, 69, 58, 0.2); border: 1px solid var(--danger); color: var(--danger); }
-        .cal-header { text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; }
-        
-        .small-text { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1c1c1e; border: 1px solid var(--border); padding: 30px 20px; border-radius: 20px; text-align: center; width: 85%; max-width: 350px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .modal-title { font-size: 1.5rem; color: var(--warning); margin-bottom: 5px; font-weight: 900;}
-        .modal-rank { font-size: 1.8rem; font-weight: bold; margin: 15px 0; text-transform: uppercase; }
-        .modal-reward { background: #2c2c2e; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 1rem; color: #fff;}
-        .btn-modal { background: var(--primary); color: #000; width: 100%; margin-top: 15px; font-size: 1.1rem; }
+        .small-text { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .chart-container { position: relative; height: 180px; width: 100%; margin-top: 15px;}
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="levelUpModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-title">¡NIVEL ALCANZADO!</div>
-            <div id="modalLvlNumber" style="font-size: 3rem; color: white; font-weight: bold;"></div>
-            <div id="modalRankDisplay" class="modal-rank"></div>
-            <div class="small-text">RECOMPENSA DESBLOQUEADA</div>
-            <div id="modalRewardText" class="modal-reward"></div>
-            <button class="btn-modal" onclick="closeModal()">Seguir progresando</button>
-        </div>
-    </div>
-
     <div class="panel">
         <div class="header-profile">
             <img id="userAvatar" src="https://via.placeholder.com/150" alt="Avatar" class="profile-img">
             <div style="flex: 1;">
-                <div class="small-text">SISTEMA ACTIVO</div>
-                <div style="font-weight: bold; font-size: 1.2rem; margin-top: 2px;">Octavio</div>
+                <div class="small-text" id="usernameDisplay">SISTEMA ACTIVO</div>
+                <div style="font-weight: 800; font-size: 1.3rem; margin-top: 2px;">Octavio</div>
             </div>
-            <button class="btn-icon" onclick="togglePanel('globalSettingsPanel')">⚙️</button>
-        </div>
-
-        <!-- Panel de Ajustes Globales -->
-        <div id="globalSettingsPanel" class="edit-panel">
-            <div class="small-text" style="margin-bottom: 8px;">Nombres de los contadores</div>
-            <div class="edit-input-group" style="flex-direction: column;">
-                <input type="text" id="labelVisualInput" placeholder="Nombre Racha 1 (Ej: Visual)">
-                <input type="text" id="labelFisicaInput" placeholder="Nombre Racha 2 (Ej: Física)">
-                <button class="btn-add" onclick="saveSettings()">Guardar Textos</button>
-            </div>
-            <button class="btn-danger" style="margin-top: 10px;" onclick="togglePanel('globalSettingsPanel')">Cerrar Ajustes</button>
+            <button class="btn-settings" onclick="toggleSettings()">⚙️</button>
         </div>
 
         <div class="level-box">
             <div id="rankBadge" class="rank-badge"></div>
             <div class="small-text">NIVEL ACTUAL</div>
             <div class="number-display level-color" id="levelDisplay">1</div>
-            <div class="small-text" style="text-transform: none;">XP Total: <span id="xpDisplay">0</span></div>
+            <div class="small-text" style="text-transform: none; color: #aaa;">XP Total: <span id="xpDisplay">0</span></div>
             <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
-        </div>
-        <div class="streaks-grid">
-            <div class="stat-box">
-                <div class="small-text" id="labelVisualDisplay">RACHA VISUAL</div>
-                <div class="number-display streak-p-color" id="streakVisual">0</div>
-                <div class="small-text" style="text-transform: none;">días</div>
-            </div>
-            <div class="stat-box">
-                <div class="small-text" id="labelFisicaDisplay">RACHA FÍSICA</div>
-                <div class="number-display streak-m-color" id="streakFisica">0</div>
-                <div class="small-text" style="text-transform: none;">días</div>
-            </div>
         </div>
     </div>
 
-    <!-- Panel de Recompensas -->
+    <!-- Recompensas -->
     <div class="panel">
-        <h3>
-            <span>🏆 Recompensa de Nivel</span>
-            <button class="btn-icon" onclick="togglePanel('editRewardsPanel')">⚙️</button>
-        </h3>
-        
-        <div id="editRewardsPanel" class="edit-panel">
-            <div class="small-text" style="margin-bottom: 8px;">Configurar Foto de Perfil</div>
-            <div class="edit-input-group">
-                <input type="text" id="newAvatarUrl" placeholder="Link de internet o nombre de archivo (Ej: mifoto.jpg)">
-                <button class="btn-add" onclick="updateAvatar()">Actualizar</button>
-            </div>
-            
-            <div class="small-text" style="margin-bottom: 8px; margin-top: 15px;">Agregar recompensa</div>
-            <div class="edit-input-group" style="flex-direction: column;">
-                <input type="number" id="newRewardLvl" placeholder="Nivel requerido (Ej: 5)">
-                <input type="text" id="newRewardText" placeholder="Ej: Cheat meal post-gym">
-                <button class="btn-add" onclick="addNewReward()">Guardar Recompensa</button>
-            </div>
-            <div class="small-text" style="margin-bottom: 8px;">Recompensas Actuales</div>
-            <ul class="list-container" id="editRewardList"></ul>
-            <button class="btn-danger" style="margin-top: 15px;" onclick="togglePanel('editRewardsPanel')">Cerrar</button>
-        </div>
-
+        <h3 style="color: var(--warning);">🏆 Recompensa Vigente</h3>
         <div id="rewardDisplay" class="reward-box"></div>
     </div>
 
-    <!-- Panel de Hábitos Diarios -->
+    <!-- Hábitos y Rachas (Unificados) -->
     <div class="panel">
-        <h3>
-            <span>📋 Hábitos Diarios (+15 XP)</span>
-            <button class="btn-icon" onclick="togglePanel('editHabitsPanel')">⚙️</button>
-        </h3>
-        
-        <div id="editHabitsPanel" class="edit-panel">
-            <div class="small-text" style="margin-bottom: 8px;">Agregar nuevo hábito</div>
-            <div class="edit-input-group">
-                <input type="text" id="newHabitInput" placeholder="Ej: Protocolo Visual Ok...">
-                <button class="btn-add" onclick="addNewHabit()">Sumar</button>
-            </div>
-            <div class="small-text" style="margin-bottom: 8px;">Tus Hábitos Actuales</div>
-            <ul class="list-container" id="editHabitList"></ul>
-            <button class="btn-danger" style="margin-top: 15px;" onclick="togglePanel('editHabitsPanel')">Cerrar</button>
-        </div>
-
-        <ul class="list-container" id="habitList"></ul>
+        <h3>📋 Sistema Diario</h3>
+        <ul class="list-container" id="mainList">
+            <!-- Se llena con JS (Hábitos + Rachas) -->
+        </ul>
     </div>
 
-    <div class="panel charts-grid">
-        <div>
-            <h3>📈 Análisis de Disciplina (7 días)</h3>
-            <div class="chart-container"><canvas id="progressChart"></canvas></div>
-        </div>
-        <div>
-            <h3>📅 Calendario</h3>
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">
-                <div class="cal-header">Do</div><div class="cal-header">Lu</div><div class="cal-header">Ma</div>
-                <div class="cal-header">Mi</div><div class="cal-header">Ju</div><div class="cal-header">Vi</div><div class="cal-header">Sa</div>
-            </div>
-            <div class="calendar-grid" id="calendarGrid"></div>
-        </div>
+    <!-- Historial y Análisis -->
+    <div class="panel">
+        <h3>📈 Análisis de Disciplina</h3>
+        <div class="chart-container"><canvas id="progressChart"></canvas></div>
     </div>
 
-    <div class="panel" style="border: 1px solid rgba(255, 69, 58, 0.3);">
-        <h3 style="color: var(--danger);">⚠️ Botones de Reinicio (-1 Nivel)</h3>
-        <button class="btn-danger" id="btnVisualRelapse" onclick="triggerRelapse('visual')">Alerta: Reiniciar Racha Visual</button>
-        <button class="btn-danger" id="btnFisicaRelapse" onclick="triggerRelapse('fisica')">Alerta: Reiniciar Racha Física</button>
+    <div class="panel">
+        <div class="cal-controls">
+            <button onclick="changeMonth(-1)">◀</button>
+            <h3 id="monthYearDisplay" style="margin: 0;">Agosto 2026</h3>
+            <button onclick="changeMonth(1)">▶</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
+            <div class="cal-header">Do</div><div class="cal-header">Lu</div><div class="cal-header">Ma</div>
+            <div class="cal-header">Mi</div><div class="cal-header">Ju</div><div class="cal-header">Vi</div><div class="cal-header">Sa</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+</div>
+
+<!-- ================= MODAL CENTRAL DE AJUSTES ================= -->
+<div id="settingsModal" class="settings-modal">
+    <div class="settings-header">
+        <h2 style="margin:0; font-size: 1.5rem;">Ajustes del Sistema</h2>
+        <button class="btn-settings" style="font-size: 2rem;" onclick="toggleSettings()">×</button>
+    </div>
+
+    <!-- Perfil -->
+    <div class="settings-section">
+        <h3 class="small-text">Configuración de Perfil</h3>
+        <label class="file-upload-btn">
+            📷 Subir Foto desde Galería
+            <input type="file" accept="image/*" onchange="handleImageUpload(event)">
+        </label>
+    </div>
+
+    <!-- Rachas Dinámicas -->
+    <div class="settings-section">
+        <h3 class="small-text">Tus Rachas Activas (Castigan XP)</h3>
+        <div class="edit-input-group">
+            <input type="text" id="newStreakEmoji" placeholder="Emoji (👁️)" style="flex: 0.3;">
+            <input type="text" id="newStreakName" placeholder="Nombre (Ej: Racha Visual)">
+            <button class="btn-add" onclick="addNewStreak()">+</button>
+        </div>
+        <ul class="list-container" id="settingsStreakList" style="margin-top: 10px;"></ul>
+    </div>
+
+    <!-- Hábitos Dinámicos -->
+    <div class="settings-section">
+        <h3 class="small-text">Tus Hábitos Diarios (+XP)</h3>
+        <div class="edit-input-group">
+            <input type="text" id="newHabitEmoji" placeholder="Emoji (🏋️)" style="flex: 0.3;">
+            <input type="text" id="newHabitName" placeholder="Nombre (Ej: Gimnasio)">
+            <button class="btn-add" onclick="addNewHabit()">+</button>
+        </div>
+        <ul class="list-container" id="settingsHabitList" style="margin-top: 10px;"></ul>
+    </div>
+
+    <!-- Recompensas -->
+    <div class="settings-section">
+        <h3 class="small-text">Árbol de Recompensas</h3>
+        <div class="edit-input-group">
+            <input type="number" id="newRewardLvl" placeholder="Lvl" style="flex: 0.3;">
+            <input type="text" id="newRewardText" placeholder="Ej: Cheat Meal">
+            <button class="btn-add" onclick="addNewReward()">+</button>
+        </div>
+        <ul class="list-container" id="settingsRewardList" style="margin-top: 10px;"></ul>
+    </div>
+
+    <!-- Datos -->
+    <div class="settings-section" style="border-color: var(--primary);">
+        <h3 class="small-text" style="color: var(--primary);">Gestión de Datos (Backup)</h3>
+        <button class="btn-add" style="width: 100%; margin-bottom: 10px;" onclick="exportData()">⬇️ Exportar Datos (Backup)</button>
+        <label class="file-upload-btn" style="margin: 0; border-color: var(--warning); color: var(--warning);">
+            ⬆️ Importar Datos JSON
+            <input type="file" accept=".json" onchange="importData(event)">
+        </label>
+        <div class="small-text" style="margin-top: 8px; text-transform: none; text-align: center;">Cargar un JSON reemplazará todos tus datos actuales.</div>
     </div>
 </div>
 
 <script>
     const XP_PER_LEVEL = 100;
     const HABIT_XP = 15;
-
-    const defaultHabits = [
-        { id: 'gym', name: 'Gimnasio / Fuerza' },
-        { id: 'music', name: 'Producir Música' },
-        { id: 'sleep', name: 'Dormir 8 hs' },
-        { id: 'racha_v', name: 'Racha Visual Intacta' },
-        { id: 'racha_f', name: 'Racha Física Intacta' }
-    ];
-
-    const defaultRewards = [
-        { level: 2, text: "20 minutos de música y un video de autos." },
-        { level: 3, text: "Hora libre en Valorant o GTA sin culpa." },
-        { level: 5, text: "Cheat Meal post-entrenamiento de fuerza." },
-        { level: 10, text: "Día libre absoluto. Dominaste el sistema." }
-    ];
-
-    let userData = JSON.parse(localStorage.getItem('detoxDataFinal')) || {
+    
+    // Inicialización de la Base de Datos
+    let userData = JSON.parse(localStorage.getItem('detoxDataV5')) || {
+        installDate: new Date().getTime(),
         xp: 0,
         level: 1,
-        lastVisualRelapse: new Date().setHours(0,0,0,0),
-        lastFisicaRelapse: new Date().setHours(0,0,0,0),
-        completedHabits: {}, 
-        history: {},
-        customHabits: defaultHabits,
-        customRewards: defaultRewards,
-        avatarUrl: "https://via.placeholder.com/150",
-        settings: {
-            labelVisual: "RACHA VISUAL",
-            labelFisica: "RACHA FÍSICA"
-        }
+        avatarBase64: "https://via.placeholder.com/150",
+        completedHabits: {}, // Guarda { habitId: "Day Date String" }
+        history: {}, // { "YYYY-MM-DD": { xpGained: int, relapsed: boolean } }
+        customHabits: [
+            { id: 'h1', emoji: '🏋️', name: 'Gimnasio / Fuerza' },
+            { id: 'h2', emoji: '🎧', name: 'Producir Música' },
+            { id: 'h3', emoji: '😴', name: 'Dormir 8 hs' }
+        ],
+        customStreaks: [
+            { id: 's1', emoji: '👁️', name: 'Racha Visual', lastRelapse: new Date().setHours(0,0,0,0) },
+            { id: 's2', emoji: '⚡', name: 'Racha Física', lastRelapse: new Date().setHours(0,0,0,0) }
+        ],
+        customRewards: [
+            { level: 2, text: "20 minutos de música y un video de autos." },
+            { level: 5, text: "Cheat Meal post-entrenamiento." },
+            { level: 10, text: "Día libre absoluto. Dominaste el sistema." }
+        ]
     };
 
-    // Parche por si venís de la versión anterior y no tenías 'settings' creado
-    if (!userData.settings) {
-        userData.settings = { labelVisual: "RACHA VISUAL", labelFisica: "RACHA FÍSICA" };
-        saveData();
-    }
-
     let chartInstance = null;
+    let currentMonthOffset = 0; // Para navegar el calendario
 
-    function getRank(level) {
-        if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "#2a2a2a" };
-        if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "#4a2e12" };
-        if (level < 10) return { name: "Plata", color: "#c0c0c0", bg: "#3a3a3a" };
-        if (level < 15) return { name: "Oro", color: "#ffd700", bg: "#4a3c00" };
-        if (level < 20) return { name: "Platino", color: "#00ced1", bg: "#004d4d" };
-        if (level < 25) return { name: "Diamante", color: "#b9f2ff", bg: "#2d5a66" };
-        if (level < 30) return { name: "Ascendente", color: "#2e8b57", bg: "#0f331f" };
-        return { name: "Radiante", color: "#fffdc2", bg: "#5a5932" };
+    // ================= FUNCIONES CORE =================
+    function saveData() {
+        localStorage.setItem('detoxDataV5', JSON.stringify(userData));
+        updateUI();
     }
 
     function getTodayString() {
@@ -274,18 +263,12 @@
         return today;
     }
 
-    function saveData() {
-        localStorage.setItem('detoxDataFinal', JSON.stringify(userData));
-        updateUI();
-    }
-
     function getStreakDays(lastDateStamp) {
         const now = new Date().getTime();
         return Math.floor(Math.abs(now - lastDateStamp) / (1000 * 60 * 60 * 24));
     }
 
     function addXP(amount) {
-        let oldLevel = userData.level;
         userData.xp = Math.max(0, userData.xp + amount);
         userData.level = Math.floor(userData.xp / XP_PER_LEVEL) + 1;
         
@@ -293,14 +276,10 @@
             const today = initTodayHistory();
             userData.history[today].xpGained += amount;
         }
-
         saveData();
-
-        if (userData.level > oldLevel) {
-            triggerLevelUpModal(userData.level);
-        }
     }
 
+    // ================= ACCIONES DE USUARIO =================
     function completeHabit(habitId) {
         const today = new Date().toDateString();
         if (userData.completedHabits[habitId] === today) return;
@@ -309,12 +288,13 @@
         addXP(HABIT_XP);
     }
 
-    function triggerRelapse(type) {
-        const label = type === 'visual' ? userData.settings.labelVisual : userData.settings.labelFisica;
-        if(confirm(`¿Estás seguro de registrar una alerta en ${label}? Vas a perder un nivel y tu contador vuelve a cero.`)) {
+    function triggerRelapse(streakId, streakName) {
+        if(confirm(`⚠️ ¿Resetear la racha "${streakName}"? Vas a perder 1 nivel.`)) {
             const now = new Date().getTime();
-            if (type === 'visual') userData.lastVisualRelapse = now;
-            if (type === 'fisica') userData.lastFisicaRelapse = now;
+            const streakIndex = userData.customStreaks.findIndex(s => s.id === streakId);
+            if(streakIndex !== -1) {
+                userData.customStreaks[streakIndex].lastRelapse = now;
+            }
             const today = initTodayHistory();
             userData.history[today].relapsed = true;
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -322,100 +302,124 @@
         }
     }
 
-    function togglePanel(panelId) {
-        const panel = document.getElementById(panelId);
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    // ================= RANGOS =================
+    function getRank(level) {
+        if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "rgba(108,108,108,0.2)" };
+        if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "rgba(205,127,50,0.2)" };
+        if (level < 10) return { name: "Plata", color: "#c0c0c0", bg: "rgba(192,192,192,0.2)" };
+        if (level < 15) return { name: "Oro", color: "#ffd700", bg: "rgba(255,215,0,0.2)" };
+        if (level < 20) return { name: "Platino", color: "#00ced1", bg: "rgba(0,206,209,0.2)" };
+        if (level < 25) return { name: "Diamante", color: "#b9f2ff", bg: "rgba(185,242,255,0.2)" };
+        if (level < 30) return { name: "Ascendente", color: "#2e8b57", bg: "rgba(46,139,87,0.2)" };
+        return { name: "Radiante", color: "#fffdc2", bg: "rgba(255,253,194,0.2)" };
     }
 
-    function saveSettings() {
-        const vInput = document.getElementById('labelVisualInput').value.trim();
-        const fInput = document.getElementById('labelFisicaInput').value.trim();
-        
-        if(vInput !== '') userData.settings.labelVisual = vInput;
-        if(fInput !== '') userData.settings.labelFisica = fInput;
-        
-        saveData();
-        togglePanel('globalSettingsPanel');
+    // ================= GESTIÓN MENÚ SETTINGS =================
+    function toggleSettings() {
+        const modal = document.getElementById('settingsModal');
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        renderSettingsLists();
     }
 
-    function updateAvatar() {
-        const input = document.getElementById('newAvatarUrl');
-        if(input.value.trim() !== '') {
-            userData.avatarUrl = input.value.trim();
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            userData.avatarBase64 = e.target.result;
             saveData();
-            input.value = '';
-        }
+            alert("Foto de perfil actualizada.");
+        };
+        reader.readAsDataURL(file);
     }
 
     function addNewHabit() {
-        const input = document.getElementById('newHabitInput');
-        const name = input.value.trim();
-        if (name === '') return;
-        userData.customHabits.push({ id: 'habit_' + Date.now(), name: name });
-        input.value = ''; saveData();
+        const emoji = document.getElementById('newHabitEmoji').value || '📌';
+        const name = document.getElementById('newHabitName').value.trim();
+        if (!name) return;
+        userData.customHabits.push({ id: 'h_' + Date.now(), emoji: emoji, name: name });
+        document.getElementById('newHabitEmoji').value = ''; document.getElementById('newHabitName').value = '';
+        saveData(); renderSettingsLists();
     }
-
-    function deleteHabit(habitId) {
-        if(confirm("¿Borrar hábito?")) {
-            userData.customHabits = userData.customHabits.filter(h => h.id !== habitId);
-            saveData();
-        }
+    
+    function addNewStreak() {
+        const emoji = document.getElementById('newStreakEmoji').value || '🔥';
+        const name = document.getElementById('newStreakName').value.trim();
+        if (!name) return;
+        userData.customStreaks.push({ id: 's_' + Date.now(), emoji: emoji, name: name, lastRelapse: new Date().setHours(0,0,0,0) });
+        document.getElementById('newStreakEmoji').value = ''; document.getElementById('newStreakName').value = '';
+        saveData(); renderSettingsLists();
     }
 
     function addNewReward() {
-        const lvlInput = document.getElementById('newRewardLvl');
-        const txtInput = document.getElementById('newRewardText');
-        const lvl = parseInt(lvlInput.value);
-        const txt = txtInput.value.trim();
-        
-        if (!lvl || txt === '') return;
-        
+        const lvl = parseInt(document.getElementById('newRewardLvl').value);
+        const txt = document.getElementById('newRewardText').value.trim();
+        if (!lvl || !txt) return;
         userData.customRewards = userData.customRewards.filter(r => r.level !== lvl);
         userData.customRewards.push({ level: lvl, text: txt });
         userData.customRewards.sort((a, b) => a.level - b.level); 
-        
-        lvlInput.value = ''; txtInput.value = ''; saveData();
+        document.getElementById('newRewardLvl').value = ''; document.getElementById('newRewardText').value = '';
+        saveData(); renderSettingsLists();
     }
 
-    function deleteReward(lvl) {
-        if(confirm("¿Borrar recompensa?")) {
-            userData.customRewards = userData.customRewards.filter(r => r.level !== lvl);
-            saveData();
-        }
+    function deleteItem(type, id) {
+        if(!confirm("¿Seguro que querés borrar esto?")) return;
+        if (type === 'habit') userData.customHabits = userData.customHabits.filter(i => i.id !== id);
+        if (type === 'streak') userData.customStreaks = userData.customStreaks.filter(i => i.id !== id);
+        if (type === 'reward') userData.customRewards = userData.customRewards.filter(i => i.level !== id);
+        saveData(); renderSettingsLists();
     }
 
-    function triggerLevelUpModal(newLevel) {
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
-        
-        const rank = getRank(newLevel);
-        document.getElementById('modalLvlNumber').innerText = newLevel;
-        
-        const rankDisplay = document.getElementById('modalRankDisplay');
-        rankDisplay.innerText = rank.name;
-        rankDisplay.style.color = rank.color;
-
-        let rewardText = "Mantené la disciplina. Revisa tu panel para futuras recompensas.";
-        const exactReward = userData.customRewards.find(r => r.level === newLevel);
-        if(exactReward) rewardText = exactReward.text;
-
-        document.getElementById('modalRewardText').innerText = rewardText;
-        document.getElementById('levelUpModal').style.display = 'flex';
+    // ================= IMPORT / EXPORT =================
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `Detox_Backup_${getTodayString()}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
     }
 
-    function closeModal() {
-        document.getElementById('levelUpModal').style.display = 'none';
+    function importData(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if(imported.xp !== undefined && imported.level !== undefined) {
+                    userData = imported;
+                    saveData();
+                    alert("Datos cargados correctamente. ¡Bienvenido de vuelta!");
+                    toggleSettings();
+                } else { alert("El archivo no es válido."); }
+            } catch(err) { alert("Error al leer el archivo JSON."); }
+        };
+        reader.readAsText(file);
+    }
+
+    // ================= RENDERIZADO UI =================
+    function renderSettingsLists() {
+        const hl = document.getElementById('settingsHabitList'); hl.innerHTML = '';
+        userData.customHabits.forEach(h => {
+            hl.innerHTML += `<li class="list-item"><span>${h.emoji} ${h.name}</span> <button class="btn-del" onclick="deleteItem('habit', '${h.id}')">✖</button></li>`;
+        });
+        const sl = document.getElementById('settingsStreakList'); sl.innerHTML = '';
+        userData.customStreaks.forEach(s => {
+            sl.innerHTML += `<li class="list-item"><span>${s.emoji} ${s.name}</span> <button class="btn-del" onclick="deleteItem('streak', '${s.id}')">✖</button></li>`;
+        });
+        const rl = document.getElementById('settingsRewardList'); rl.innerHTML = '';
+        userData.customRewards.forEach(r => {
+            rl.innerHTML += `<li class="list-item"><span>Lvl ${r.level}: ${r.text}</span> <button class="btn-del" onclick="deleteItem('reward', ${r.level})">✖</button></li>`;
+        });
     }
 
     function updateUI() {
-        document.getElementById('userAvatar').src = userData.avatarUrl;
+        // Inicializar día para el calendario automático
+        initTodayHistory();
 
-        // Actualizar textos configurables
-        document.getElementById('labelVisualDisplay').innerText = userData.settings.labelVisual.toUpperCase();
-        document.getElementById('labelFisicaDisplay').innerText = userData.settings.labelFisica.toUpperCase();
-        
-        document.getElementById('btnVisualRelapse').innerText = "Alerta: Reiniciar " + userData.settings.labelVisual;
-        document.getElementById('btnFisicaRelapse').innerText = "Alerta: Reiniciar " + userData.settings.labelFisica;
-
+        document.getElementById('userAvatar').src = userData.avatarBase64;
         document.getElementById('levelDisplay').innerText = userData.level;
         document.getElementById('xpDisplay').innerText = userData.xp;
         const xpPercentage = ((userData.xp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
@@ -427,53 +431,50 @@
         badge.style.backgroundColor = rank.bg;
         badge.style.color = rank.color;
 
-        let currentReward = "Seguí sumando XP para tu primera recompensa.";
+        let currentReward = "Farméa XP para tu primera recompensa.";
         let highestLvl = 0;
         userData.customRewards.forEach(r => {
             if (r.level <= userData.level && r.level > highestLvl) {
-                highestLvl = r.level;
-                currentReward = r.text;
+                highestLvl = r.level; currentReward = r.text;
             }
         });
         document.getElementById('rewardDisplay').innerText = currentReward;
 
-        document.getElementById('streakVisual').innerText = getStreakDays(userData.lastVisualRelapse);
-        document.getElementById('streakFisica').innerText = getStreakDays(userData.lastFisicaRelapse);
+        // Renderizar Lista Principal (Hábitos + Rachas)
+        const mainList = document.getElementById('mainList');
+        mainList.innerHTML = '';
+        
+        // 1. Imprimir Rachas Activas
+        userData.customStreaks.forEach(streak => {
+            const days = getStreakDays(streak.lastRelapse);
+            mainList.innerHTML += `
+                <li class="list-item" style="border-color: rgba(255,255,255,0.15);">
+                    <div class="streak-info">
+                        <span>${streak.emoji} ${streak.name}</span>
+                        <span class="streak-days">🔥 ${days} Días</span>
+                    </div>
+                    <button class="btn-reset" onclick="triggerRelapse('${streak.id}', '${streak.name}')">🔄 Reset</button>
+                </li>`;
+        });
 
-        const habitList = document.getElementById('habitList');
-        const editHabitList = document.getElementById('editHabitList');
-        habitList.innerHTML = ''; editHabitList.innerHTML = '';
+        // 2. Imprimir Hábitos Diarios
         const todayStr = new Date().toDateString();
-
         userData.customHabits.forEach(habit => {
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
-            habitList.innerHTML += `
+            mainList.innerHTML += `
                 <li class="list-item">
-                    <span>${habit.name}</span>
+                    <span>${habit.emoji} ${habit.name}</span>
                     <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}')">
-                        ${isCompleted ? '✓ Listo' : '+ Hacer'}
+                        ${isCompleted ? '✓' : '+ XP'}
                     </button>
                 </li>`;
-            editHabitList.innerHTML += `
-                <li class="list-item">
-                    <span>${habit.name}</span>
-                    <button class="btn-del" onclick="deleteHabit('${habit.id}')">✖</button>
-                </li>`;
         });
 
-        const editRewardList = document.getElementById('editRewardList');
-        editRewardList.innerHTML = '';
-        userData.customRewards.forEach(reward => {
-            editRewardList.innerHTML += `
-                <li class="list-item">
-                    <span><strong>Lvl ${reward.level}:</strong> ${reward.text}</span>
-                    <button class="btn-del" onclick="deleteReward(${reward.level})">✖</button>
-                </li>`;
-        });
-
-        updateChart(); updateCalendar();
+        updateChart(); 
+        renderCalendar();
     }
 
+    // ================= GRÁFICOS Y CALENDARIO MENSUAL =================
     function updateChart() {
         const ctx = document.getElementById('progressChart').getContext('2d');
         const labels = []; const data = [];
@@ -486,28 +487,69 @@
         if(chartInstance) chartInstance.destroy();
         chartInstance = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#30d158', borderRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#2c2c2e' }, ticks: { color: '#8e8e93', stepSize: 20 } }, x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
+            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#00ff88', borderRadius: 6 }] },
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888', stepSize: 20 } }, 
+                    x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } } 
+                }, 
+                plugins: { legend: { display: false } } 
+            }
         });
     }
 
-    function updateCalendar() {
-        const cal = document.getElementById('calendarGrid'); cal.innerHTML = '';
-        const date = new Date(); const year = date.getFullYear(); const month = date.getMonth();
-        const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-        for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`;
+    function changeMonth(dir) {
+        currentMonthOffset += dir;
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const cal = document.getElementById('calendarGrid'); 
+        cal.innerHTML = '';
+        
+        const targetDate = new Date();
+        targetDate.setMonth(targetDate.getMonth() + currentMonthOffset);
+        
+        const year = targetDate.getFullYear(); 
+        const month = targetDate.getMonth();
+        
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        document.getElementById('monthYearDisplay').innerText = `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay(); 
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Obtener la fecha de hoy a las 00:00 para comparar
+        const todayNoTime = new Date().setHours(0,0,0,0);
+        const installNoTime = new Date(userData.installDate).setHours(0,0,0,0);
+
+        for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`; // Espacios vacíos
+        
         for(let day = 1; day <= daysInMonth; day++) {
+            const loopDateObj = new Date(year, month, day);
+            const loopNoTime = loopDateObj.setHours(0,0,0,0);
             const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const history = userData.history[dateStr];
+            
             let className = 'cal-day';
-            if (history) {
-                if (history.relapsed) className += ' fail';
-                else if (history.xpGained > 0) className += ' success';
+            
+            // Lógica de Pintado Automático (Verde si no hubo recaída)
+            // Solo pinta los días desde que instalaste la app hasta hoy
+            if (loopNoTime >= installNoTime && loopNoTime <= todayNoTime) {
+                const historyRecord = userData.history[dateStr];
+                
+                if (historyRecord && historyRecord.relapsed) {
+                    className += ' fail'; // Hubo recaída
+                } else {
+                    className += ' success'; // Automáticamente verde si sobrevivió el día
+                }
             }
+            
             cal.innerHTML += `<div class="${className}">${day}</div>`;
         }
     }
 
+    // Arrancar la app
     updateUI();
 </script>
 
