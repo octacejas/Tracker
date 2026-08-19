@@ -6,7 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Detox OS">
-    <link rel="apple-touch-icon" href="icono.png">
+    
+    <!-- ÍCONO DE LA APP: Pegá el link directo de tu imagen entre las comillas -->
+    <link rel="apple-touch-icon" href="URL_DE_TU_IMAGEN_ACA">
+    <link rel="icon" href="URL_DE_TU_IMAGEN_ACA">
+    
     <title>Dopamine Detox OS</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,14 +27,21 @@
             --border: rgba(255, 255, 255, 0.08);
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
+        
+        body, html {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, sans-serif;
             background-color: var(--bg-color); color: var(--text);
-            margin: 0; padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px;
+            margin: 0; padding: 0;
             overscroll-behavior-y: none;
+            overflow-x: hidden; /* CORRECCIÓN: Bloquea el scroll horizontal en toda la app */
+            width: 100vw;
         }
         
-        .container { max-width: 800px; margin: 20px auto; padding-bottom: 40px; }
+        .container { 
+            max-width: 800px; margin: 0 auto; 
+            padding: max(20px, env(safe-area-inset-top)) 15px max(40px, env(safe-area-inset-bottom)) 15px; 
+            width: 100%;
+        }
         
         .panel { 
             background: var(--panel-bg); 
@@ -38,16 +49,15 @@
             padding: 20px; border-radius: 18px; margin-bottom: 15px; 
             border: 1px solid var(--border);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
         }
         
         h2, h3 { margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; letter-spacing: -0.5px;}
         
-        /* Header y Perfil */
         .header-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .profile-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .btn-settings { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .btn-settings { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; padding: 0;}
         
-        /* Level Box */
         .level-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 14px; text-align: center; margin-bottom: 15px; position: relative; border: 1px solid var(--border);}
         .rank-badge { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px;}
         .number-display { font-size: 3rem; font-weight: 800; margin: 5px 0; font-variant-numeric: tabular-nums;}
@@ -56,20 +66,19 @@
         .xp-bar-container { background-color: #111; border-radius: 10px; height: 10px; overflow: hidden; margin-top: 15px; border: 1px solid var(--border);}
         .xp-bar { height: 100%; background: linear-gradient(90deg, #0088ff, var(--primary)); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Listas Mixtas (Hábitos y Rachas) */
         .list-container { list-style: none; padding: 0; display: grid; gap: 12px; margin:0;}
         .list-item { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 16px; background: rgba(0,0,0,0.3); border-radius: 14px; 
             border: 1px solid var(--border); font-size: 1rem; font-weight: 500;
+            word-wrap: break-word; overflow-wrap: break-word; /* CORRECCIÓN: Rompe textos largos */
         }
-        .streak-info { display: flex; flex-direction: column; }
+        .streak-info { display: flex; flex-direction: column; flex: 1; min-width: 0; padding-right: 10px; }
         .streak-days { font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-top: 2px;}
         
-        /* Botones */
         button { border: none; border-radius: 10px; cursor: pointer; font-weight: 700; transition: transform 0.1s; min-height: 44px; font-family: inherit;}
         button:active { transform: scale(0.95); }
-        .btn-add { background-color: var(--primary); color: #000; padding: 0 18px; }
+        .btn-add { background-color: var(--primary); color: #000; padding: 0 18px; white-space: nowrap;}
         .btn-add:disabled { background-color: #222; color: #555; }
         .btn-reset { background-color: rgba(255, 42, 42, 0.15); color: var(--danger); border: 1px solid var(--danger); padding: 0 15px; font-size: 0.85rem;}
         .btn-danger { background-color: var(--danger); color: white; width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
@@ -77,7 +86,6 @@
         
         .reward-box { background: rgba(0,0,0,0.4); border-left: 4px solid var(--warning); padding: 15px; border-radius: 6px 12px 12px 6px; font-size: 0.95rem; line-height: 1.5; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);}
         
-        /* Calendario Mensual */
         .cal-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .cal-controls button { background: none; color: var(--text); font-size: 1.2rem; min-height: auto; padding: 5px 15px; border: 1px solid var(--border);}
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -86,12 +94,28 @@
         .cal-day.fail { background-color: rgba(255, 42, 42, 0.15); border: 1px solid var(--danger); color: var(--danger); }
         .cal-header { text-align: center; font-weight: 700; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px;}
         
-        /* Settings Modal Centralizado */
-        .settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; overflow-y: auto; padding: env(safe-area-inset-top) 15px 40px 15px; }
+        /* CORRECCIÓN: Ajustes estrictos en el Modal de Configuración */
+        .settings-modal { 
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: var(--bg-color); z-index: 2000; 
+            overflow-y: auto; overflow-x: hidden; 
+            padding: max(20px, env(safe-area-inset-top)) 15px 40px 15px; 
+            width: 100vw; box-sizing: border-box;
+        }
         .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
-        .settings-section { margin-bottom: 30px; background: var(--panel-bg); padding: 15px; border-radius: 14px; border: 1px solid var(--border); }
-        .edit-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        input[type="text"], input[type="number"], select { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.5); color: white; font-size: 1rem; }
+        .settings-section { 
+            margin-bottom: 30px; background: var(--panel-bg); padding: 15px; 
+            border-radius: 14px; border: 1px solid var(--border); 
+            width: 100%; box-sizing: border-box; overflow-x: hidden;
+        }
+        .edit-input-group { 
+            display: flex; gap: 10px; margin-bottom: 10px; width: 100%;
+        }
+        input[type="text"], input[type="number"], select { 
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
+            background: rgba(0,0,0,0.5); color: white; font-size: 1rem; 
+            min-width: 0; /* CORRECCIÓN: Evita que los campos se salgan de la pantalla */
+        }
         input[type="file"] { display: none; }
         .file-upload-btn { background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: white; padding: 12px; text-align: center; border-radius: 10px; display: block; width: 100%; margin-bottom: 10px; font-weight: 600;}
         
@@ -131,7 +155,7 @@
     <div class="panel">
         <h3>📋 Sistema Diario</h3>
         <ul class="list-container" id="mainList">
-            <!-- Se llena con JS (Hábitos + Rachas) -->
+            <!-- Se llena con JS -->
         </ul>
     </div>
 
@@ -175,8 +199,8 @@
     <div class="settings-section">
         <h3 class="small-text">Tus Rachas Activas (Castigan XP)</h3>
         <div class="edit-input-group">
-            <input type="text" id="newStreakEmoji" placeholder="Emoji (👁️)" style="flex: 0.3;">
-            <input type="text" id="newStreakName" placeholder="Nombre (Ej: Racha Visual)">
+            <input type="text" id="newStreakEmoji" placeholder="Emoji" style="flex: 0.3;">
+            <input type="text" id="newStreakName" placeholder="Nombre">
             <button class="btn-add" onclick="addNewStreak()">+</button>
         </div>
         <ul class="list-container" id="settingsStreakList" style="margin-top: 10px;"></ul>
@@ -186,8 +210,8 @@
     <div class="settings-section">
         <h3 class="small-text">Tus Hábitos Diarios (+XP)</h3>
         <div class="edit-input-group">
-            <input type="text" id="newHabitEmoji" placeholder="Emoji (🏋️)" style="flex: 0.3;">
-            <input type="text" id="newHabitName" placeholder="Nombre (Ej: Gimnasio)">
+            <input type="text" id="newHabitEmoji" placeholder="Emoji" style="flex: 0.3;">
+            <input type="text" id="newHabitName" placeholder="Nombre">
             <button class="btn-add" onclick="addNewHabit()">+</button>
         </div>
         <ul class="list-container" id="settingsHabitList" style="margin-top: 10px;"></ul>
@@ -198,7 +222,7 @@
         <h3 class="small-text">Árbol de Recompensas</h3>
         <div class="edit-input-group">
             <input type="number" id="newRewardLvl" placeholder="Lvl" style="flex: 0.3;">
-            <input type="text" id="newRewardText" placeholder="Ej: Cheat Meal">
+            <input type="text" id="newRewardText" placeholder="Recompensa">
             <button class="btn-add" onclick="addNewReward()">+</button>
         </div>
         <ul class="list-container" id="settingsRewardList" style="margin-top: 10px;"></ul>
@@ -220,14 +244,13 @@
     const XP_PER_LEVEL = 100;
     const HABIT_XP = 15;
     
-    // Inicialización de la Base de Datos
     let userData = JSON.parse(localStorage.getItem('detoxDataV5')) || {
         installDate: new Date().getTime(),
         xp: 0,
         level: 1,
         avatarBase64: "https://via.placeholder.com/150",
-        completedHabits: {}, // Guarda { habitId: "Day Date String" }
-        history: {}, // { "YYYY-MM-DD": { xpGained: int, relapsed: boolean } }
+        completedHabits: {}, 
+        history: {}, 
         customHabits: [
             { id: 'h1', emoji: '🏋️', name: 'Gimnasio / Fuerza' },
             { id: 'h2', emoji: '🎧', name: 'Producir Música' },
@@ -245,9 +268,8 @@
     };
 
     let chartInstance = null;
-    let currentMonthOffset = 0; // Para navegar el calendario
+    let currentMonthOffset = 0; 
 
-    // ================= FUNCIONES CORE =================
     function saveData() {
         localStorage.setItem('detoxDataV5', JSON.stringify(userData));
         updateUI();
@@ -280,7 +302,6 @@
         saveData();
     }
 
-    // ================= ACCIONES DE USUARIO =================
     function completeHabit(habitId) {
         const today = new Date().toDateString();
         if (userData.completedHabits[habitId] === today) return;
@@ -303,7 +324,6 @@
         }
     }
 
-    // ================= RANGOS =================
     function getRank(level) {
         if (level < 3) return { name: "Hierro", color: "#6c6c6c", bg: "rgba(108,108,108,0.2)" };
         if (level < 6) return { name: "Bronce", color: "#cd7f32", bg: "rgba(205,127,50,0.2)" };
@@ -315,7 +335,6 @@
         return { name: "Radiante", color: "#fffdc2", bg: "rgba(255,253,194,0.2)" };
     }
 
-    // ================= GESTIÓN MENÚ SETTINGS =================
     function toggleSettings() {
         const modal = document.getElementById('settingsModal');
         modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
@@ -371,7 +390,6 @@
         saveData(); renderSettingsLists();
     }
 
-    // ================= IMPORT / EXPORT =================
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData));
         const downloadAnchor = document.createElement('a');
@@ -400,7 +418,6 @@
         reader.readAsText(file);
     }
 
-    // ================= RENDERIZADO UI =================
     function renderSettingsLists() {
         const hl = document.getElementById('settingsHabitList'); hl.innerHTML = '';
         userData.customHabits.forEach(h => {
@@ -417,7 +434,6 @@
     }
 
     function updateUI() {
-        // Inicializar día para el calendario automático
         initTodayHistory();
 
         document.getElementById('userAvatar').src = userData.avatarBase64;
@@ -441,11 +457,9 @@
         });
         document.getElementById('rewardDisplay').innerText = currentReward;
 
-        // Renderizar Lista Principal (Hábitos + Rachas)
         const mainList = document.getElementById('mainList');
         mainList.innerHTML = '';
         
-        // 1. Imprimir Rachas Activas
         userData.customStreaks.forEach(streak => {
             const days = getStreakDays(streak.lastRelapse);
             mainList.innerHTML += `
@@ -458,7 +472,6 @@
                 </li>`;
         });
 
-        // 2. Imprimir Hábitos Diarios
         const todayStr = new Date().toDateString();
         userData.customHabits.forEach(habit => {
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
@@ -475,7 +488,6 @@
         renderCalendar();
     }
 
-    // ================= GRÁFICOS Y CALENDARIO MENSUAL =================
     function updateChart() {
         const ctx = document.getElementById('progressChart').getContext('2d');
         const labels = []; const data = [];
@@ -521,11 +533,10 @@
         const firstDay = new Date(year, month, 1).getDay(); 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         
-        // Obtener la fecha de hoy a las 00:00 para comparar
         const todayNoTime = new Date().setHours(0,0,0,0);
         const installNoTime = new Date(userData.installDate).setHours(0,0,0,0);
 
-        for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`; // Espacios vacíos
+        for(let i = 0; i < firstDay; i++) cal.innerHTML += `<div></div>`; 
         
         for(let day = 1; day <= daysInMonth; day++) {
             const loopDateObj = new Date(year, month, day);
@@ -534,15 +545,12 @@
             
             let className = 'cal-day';
             
-            // Lógica de Pintado Automático (Verde si no hubo recaída)
-            // Solo pinta los días desde que instalaste la app hasta hoy
             if (loopNoTime >= installNoTime && loopNoTime <= todayNoTime) {
                 const historyRecord = userData.history[dateStr];
-                
                 if (historyRecord && historyRecord.relapsed) {
-                    className += ' fail'; // Hubo recaída
+                    className += ' fail';
                 } else {
-                    className += ' success'; // Automáticamente verde si sobrevivió el día
+                    className += ' success';
                 }
             }
             
@@ -550,7 +558,6 @@
         }
     }
 
-    // Arrancar la app
     updateUI();
 </script>
 
