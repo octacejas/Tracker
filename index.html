@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Detox OS">
     
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=3">
-    <link rel="icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=3">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=4">
+    <link rel="icon" href="https://i.postimg.cc/TPM5C68M/stoic.jpg?v=4">
     
     <title>Dopamine Detox OS</title>
     
@@ -19,11 +19,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
+            /* Modo Claro (Defecto) */
             --bg-color: #ffffff; 
             --text: #000000; 
-            --text-muted: #666666; 
+            --text-muted: #777777; 
             --border: #000000;
+            --danger: #d93838;
+            --invert-filter: invert(0);
         }
+        
+        /* Modo Oscuro Dinámico */
+        body.dark-mode {
+            --bg-color: #121212; 
+            --text: #e8e8e8; 
+            --text-muted: #888888; 
+            --border: #444444;
+            --danger: #ff5555;
+            --invert-filter: invert(1) hue-rotate(180deg);
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html {
@@ -33,6 +47,7 @@
             overscroll-behavior-y: none;
             overflow-x: hidden; 
             width: 100vw;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         .container { 
@@ -46,24 +61,26 @@
             padding: 0 0 25px 0; margin-bottom: 25px; 
             border-bottom: 1px solid var(--border);
             width: 100%;
+            transition: border-color 0.3s;
         }
         
         h2, h3 { 
             font-family: 'Playfair Display', serif;
             margin-top: 0; font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; 
             display: flex; justify-content: space-between; align-items: center; 
-            color: #000000;
+            color: var(--text);
+            transition: color 0.3s;
         }
         
         .header-profile { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .profile-img { width: 60px; height: 60px; border-radius: 0; object-fit: cover; border: 1px solid var(--border); filter: grayscale(100%);}
-        .btn-settings { background: none; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; transition: 0.2s; padding: 0;}
+        .profile-img { width: 85px; height: 85px; border-radius: 0; object-fit: cover; border: 1px solid var(--border); filter: grayscale(100%); transition: border-color 0.3s;}
+        .btn-header { background: none; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; transition: 0.2s; padding: 0 5px;}
         
         .level-box { padding: 15px 0; text-align: left; position: relative;}
         .number-display { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; margin: 0; line-height: 1;}
         
         .xp-bar-container { background-color: transparent; height: 4px; overflow: hidden; margin-top: 15px; border: 1px solid var(--border);}
-        .xp-bar { height: 100%; background: #000; width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .xp-bar { height: 100%; background: var(--text); width: 0%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
         .list-container { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0; margin:0;}
         .list-item { 
@@ -73,43 +90,45 @@
             word-wrap: break-word; overflow-wrap: break-word;
         }
         .list-item:last-child { border-bottom: none; }
-        .streak-info { display: flex; flex-direction: column; flex: 1; min-width: 0; padding-right: 10px; }
-        .streak-days { font-family: 'Playfair Display', serif; font-size: 0.9rem; color: var(--text); font-style: italic; margin-top: 2px;}
+        
+        .item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; padding-right: 10px; }
+        .item-subtext { font-family: 'Playfair Display', serif; font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-top: 2px;}
+        .text-danger { color: var(--danger) !important; font-weight: bold;}
         
         button { 
             border: 1px solid var(--border); border-radius: 0; cursor: pointer; 
-            font-weight: 600; transition: transform 0.1s; min-height: 36px; 
+            font-weight: 600; transition: transform 0.1s, background 0.3s, color 0.3s; min-height: 36px; 
             font-family: inherit; font-size: 0.85rem; padding: 0 15px;
         }
-        button:active { transform: scale(0.95); background: #f0f0f0;}
-        .btn-add { background-color: #000; color: #fff; border-color: #000; white-space: nowrap;}
-        .btn-add:disabled { background-color: #fff; color: #aaa; border-color: #aaa; }
-        .btn-reset { background-color: transparent; color: #000;}
-        .btn-danger { background-color: #000; color: #fff; width: 100%; padding: 12px; margin-top: 10px; }
+        button:active { transform: scale(0.95); }
+        .btn-add { background-color: var(--text); color: var(--bg-color); border-color: var(--text); white-space: nowrap;}
+        .btn-add:disabled { background-color: transparent; color: var(--text-muted); border-color: var(--text-muted); }
+        
+        .btn-danger-outline { background-color: transparent; color: var(--text); border: 1px solid var(--border); width: 100%; padding: 12px; margin-top: 10px; font-family: 'Playfair Display', serif; font-style: italic;}
         .btn-icon-small { background: transparent; border: none; font-size: 1rem; padding: 0 8px; color: var(--text); min-height: auto;}
         
-        .reward-box { font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; padding: 10px 0; color: #000;}
+        .reward-box { font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; padding: 10px 0; color: var(--text);}
         
         .cal-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .cal-controls button { background: transparent; color: var(--text); font-size: 1rem; min-height: auto; padding: 5px 15px; border: 1px solid var(--border);}
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .cal-day { background-color: transparent; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; font-size: 0.85rem;}
-        .cal-day.success { background-color: #000; color: #fff; border-color: #000;}
-        .cal-day.fail { background-color: transparent; color: #ccc; text-decoration: line-through; border-color: #eee;}
+        .cal-day { background-color: transparent; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); font-size: 0.85rem; opacity: 0.4;}
+        .cal-day.success { background-color: var(--text); color: var(--bg-color); border-color: var(--text); opacity: 1;}
+        .cal-day.fail { background-color: transparent; color: var(--danger); text-decoration: line-through; border-color: var(--danger); opacity: 1;}
         .cal-header { text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px; font-family: 'Playfair Display', serif; font-style: italic;}
         
         textarea { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 12px; font-family: inherit; font-size: 0.95rem; border-radius: 0; resize: vertical; min-height: 100px; outline: none; }
         textarea:focus { border-width: 2px; }
 
-        .settings-modal, .onboarding-modal { 
+        .settings-modal, .onboarding-modal, .relapse-modal { 
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
             background: var(--bg-color); z-index: 2000; 
             overflow-y: auto; overflow-x: hidden; 
             padding: max(20px, env(safe-area-inset-top)) 15px 40px 15px; 
             width: 100vw; box-sizing: border-box;
         }
-        .onboarding-modal { z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center;}
-        .onboarding-content { width: 100%; max-width: 400px; text-align: center;}
+        .onboarding-modal, .relapse-modal { z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+        .modal-content-box { width: 100%; max-width: 400px; text-align: left; }
         
         .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
         .settings-section { margin-bottom: 25px; padding: 10px 0; width: 100%; border-bottom: 1px dotted var(--text-muted);}
@@ -117,32 +136,48 @@
         .edit-input-group { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; }
         input[type="text"], input[type="number"] { 
             flex: 1; padding: 10px; border-radius: 0; border: 1px solid var(--border); 
-            background: transparent; color: #000; font-size: 0.95rem; min-width: 0; font-family: inherit;
+            background: transparent; color: var(--text); font-size: 0.95rem; min-width: 0; font-family: inherit;
         }
-        .file-upload-btn { background: transparent; border: 1px dashed var(--border); color: #000; padding: 12px; text-align: center; display: block; width: 100%; margin-bottom: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;}
+        .file-upload-btn { background: transparent; border: 1px dashed var(--border); color: var(--text); padding: 12px; text-align: center; display: block; width: 100%; margin-bottom: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;}
         input[type="file"] { display: none; }
         
         .small-text { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
         .chart-container { position: relative; height: 160px; width: 100%; margin-top: 15px;}
         .action-buttons { display: flex; gap: 5px; }
+
+        /* Estilos Checkbox Modal Recaída */
+        .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px dotted var(--text-muted); padding-bottom: 10px;}
+        .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--text); }
     </style>
 </head>
 <body>
 
-<!-- ================= PANTALLA DE BIENVENIDA (ONBOARDING) ================= -->
+<!-- ================= PANTALLA DE BIENVENIDA ================= -->
 <div id="onboardingModal" class="onboarding-modal">
-    <div class="onboarding-content">
+    <div class="modal-content-box" style="text-align: center;">
         <h2 style="justify-content: center; font-size: 2.5rem; font-style: italic;">Initiate.</h2>
         <p style="color: var(--text-muted); margin-bottom: 30px; font-family: 'Playfair Display', serif;">Define your identity to begin.</p>
-        
         <input type="text" id="onboardingName" placeholder="Name" style="width: 100%; margin-bottom: 15px; text-align: center;">
-        
         <label class="file-upload-btn" style="margin-bottom: 30px;">
             Select Image
             <input type="file" accept="image/*" onchange="handleOnboardingImage(event)">
         </label>
-        
         <button class="btn-add" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="finishOnboarding()">Enter</button>
+    </div>
+</div>
+
+<!-- ================= MODAL DE RECAÍDA (BULK RESET) ================= -->
+<div id="relapseModal" class="relapse-modal">
+    <div class="modal-content-box">
+        <h2 style="font-size: 2rem; font-style: italic; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Report Relapse</h2>
+        <p style="color: var(--text-muted); font-family: 'Playfair Display', serif; margin-bottom: 20px;">
+            Select the streaks you broke today. An optimized penalty (-1 Level) will be applied once, regardless of how many you select.
+        </p>
+        <div id="relapseCheckboxes"></div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button style="flex: 1;" onclick="closeRelapseModal()">Cancel</button>
+            <button class="btn-add" style="flex: 1;" onclick="confirmRelapse()">Apply Reset</button>
+        </div>
     </div>
 </div>
 
@@ -154,13 +189,16 @@
                 <div class="small-text">IDENTITY</div>
                 <div id="usernameDisplay" style="font-weight: 600; font-size: 1.2rem; margin-top: 2px;">User</div>
             </div>
-            <button class="btn-settings" onclick="toggleSettings()">⚙</button>
+            <div>
+                <button class="btn-header" onclick="toggleDarkMode()">🌓</button>
+                <button class="btn-header" onclick="toggleSettings()">⚙</button>
+            </div>
         </div>
 
         <div class="level-box">
             <div class="small-text">CURRENT STAGE</div>
             <div class="number-display" id="levelDisplay">1</div>
-            <div class="small-text" style="color: #999; margin-top: 5px;">Total XP: <span id="xpDisplay">0</span></div>
+            <div class="small-text" style="color: var(--text-muted); margin-top: 5px;">Total XP: <span id="xpDisplay">0</span></div>
             <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
         </div>
     </div>
@@ -171,8 +209,14 @@
     </div>
 
     <div class="panel">
+        <h3>Active Streaks</h3>
+        <ul class="list-container" id="streakList"></ul>
+        <button class="btn-danger-outline" onclick="openRelapseModal()">Report Relapse (Reset)</button>
+    </div>
+
+    <div class="panel">
         <h3>Daily Protocol</h3>
-        <ul class="list-container" id="mainList"></ul>
+        <ul class="list-container" id="habitList"></ul>
     </div>
 
     <div class="panel">
@@ -231,8 +275,9 @@
     <div class="settings-section">
         <h3 class="small-text">Daily Habits</h3>
         <div class="edit-input-group">
-            <input type="text" id="newHabitEmoji" placeholder="Emoji" style="flex: 0.3;">
-            <input type="text" id="newHabitName" placeholder="Name">
+            <input type="text" id="newHabitEmoji" placeholder="Emoji" style="flex: 0.2;">
+            <input type="text" id="newHabitName" placeholder="Name" style="flex: 0.5;">
+            <input type="number" id="newHabitXP" placeholder="XP" value="15" style="flex: 0.3;">
             <button class="btn-add" onclick="addNewHabit()">+</button>
         </div>
         <ul class="list-container" id="settingsHabitList" style="margin-top: 10px;"></ul>
@@ -260,9 +305,7 @@
 
 <script>
     const XP_PER_LEVEL = 100;
-    const HABIT_XP = 15;
     
-    // Intenta cargar la versión actual. Si no existe, busca la V5 anterior para auto-migrar.
     let savedData = JSON.parse(localStorage.getItem('detoxDataStoic'));
     if (!savedData) {
         let legacyData = JSON.parse(localStorage.getItem('detoxDataV5'));
@@ -277,6 +320,7 @@
 
     let userData = savedData || {
         onboardingDone: false,
+        darkMode: false, // Guardar estado del modo oscuro
         username: "User",
         installDate: new Date().getTime(),
         xp: 0,
@@ -286,9 +330,9 @@
         completedHabits: {}, 
         history: {}, 
         customHabits: [
-            { id: 'h1', emoji: '—', name: 'Physical Training' },
-            { id: 'h2', emoji: '—', name: 'Deep Work' },
-            { id: 'h3', emoji: '—', name: 'Restoration (8hrs)' }
+            { id: 'h1', emoji: '—', name: 'Physical Training', xp: 15 },
+            { id: 'h2', emoji: '—', name: 'Deep Work', xp: 15 },
+            { id: 'h3', emoji: '—', name: 'Restoration (8hrs)', xp: 15 }
         ],
         customStreaks: [
             { id: 's1', emoji: '👁', name: 'Visual Discipline', lastRelapse: new Date().setHours(0,0,0,0) },
@@ -301,23 +345,39 @@
         ]
     };
 
-    // Parche por si se importa un archivo viejo
+    // Parche para variables nuevas en usuarios viejos
     if(userData.onboardingDone === undefined) userData.onboardingDone = false;
     if(userData.notes === undefined) userData.notes = "";
     if(userData.username === undefined) userData.username = "User";
+    if(userData.darkMode === undefined) userData.darkMode = false;
+    
+    // Auto-aplicar modo oscuro si estaba guardado
+    if (userData.darkMode) document.body.classList.add('dark-mode');
 
     let chartInstance = null;
     let currentMonthOffset = 0; 
     let tempOnboardingImg = null;
+
+    // EVENT LISTENER: Recarga automática al volver a la app (Fix bug cambio de día en iOS)
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            updateUI(); // Forza a re-leer el "today" y actualizar los botones
+        }
+    });
 
     function saveData() {
         localStorage.setItem('detoxDataStoic', JSON.stringify(userData));
         updateUI();
     }
 
-    // ================= ONBOARDING =================
+    function toggleDarkMode() {
+        userData.darkMode = !userData.darkMode;
+        if (userData.darkMode) document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
+        saveData();
+    }
+
     function checkOnboarding() {
-        // Validacion inteligente: si ya tiene XP o nivel, asume que es usuario avanzado
         if (userData.onboardingDone || userData.xp > 0 || userData.level > 1) {
             userData.onboardingDone = true;
             document.getElementById('onboardingModal').style.display = 'none';
@@ -342,13 +402,11 @@
         const nameInput = document.getElementById('onboardingName').value.trim();
         if (nameInput) userData.username = nameInput;
         if (tempOnboardingImg) userData.avatarBase64 = tempOnboardingImg;
-        
         userData.onboardingDone = true;
         document.getElementById('onboardingModal').style.display = 'none';
         saveData();
     }
 
-    // ================= NOTAS & PERFIL =================
     function saveNotes() {
         userData.notes = document.getElementById('appNotes').value;
         saveData();
@@ -363,7 +421,6 @@
         }
     }
 
-    // ================= LOGICA CORE =================
     function getTodayString() {
         const d = new Date();
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -376,8 +433,9 @@
     }
 
     function getStreakDays(lastDateStamp) {
-        const now = new Date().getTime();
-        return Math.floor(Math.abs(now - lastDateStamp) / (1000 * 60 * 60 * 24));
+        const today = new Date().setHours(0,0,0,0);
+        const last = new Date(lastDateStamp).setHours(0,0,0,0);
+        return Math.floor(Math.abs(today - last) / (1000 * 60 * 60 * 24));
     }
 
     function addXP(amount) {
@@ -390,28 +448,55 @@
         saveData();
     }
 
-    function completeHabit(habitId) {
+    function completeHabit(habitId, xpAmount) {
         const today = new Date().toDateString();
         if (userData.completedHabits[habitId] === today) return;
         if (navigator.vibrate) navigator.vibrate(50);
         userData.completedHabits[habitId] = today;
-        addXP(HABIT_XP);
+        addXP(xpAmount || 15);
     }
 
-    function triggerRelapse(streakId, streakName) {
-        if(confirm(`Reset "${streakName}"? You will lose 1 Level.`)) {
-            const now = new Date().getTime();
-            const streakIndex = userData.customStreaks.findIndex(s => s.id === streakId);
-            if(streakIndex !== -1) userData.customStreaks[streakIndex].lastRelapse = now;
-            
-            const today = initTodayHistory();
-            userData.history[today].relapsed = true;
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-            addXP(-XP_PER_LEVEL);
+    // ================= SISTEMA DE RECAÍDA MASIVA =================
+    function openRelapseModal() {
+        const container = document.getElementById('relapseCheckboxes');
+        container.innerHTML = '';
+        userData.customStreaks.forEach(s => {
+            container.innerHTML += `
+                <label class="checkbox-row">
+                    <input type="checkbox" value="${s.id}">
+                    <span>${s.emoji} ${s.name}</span>
+                </label>
+            `;
+        });
+        document.getElementById('relapseModal').style.display = 'flex';
+    }
+
+    function closeRelapseModal() {
+        document.getElementById('relapseModal').style.display = 'none';
+    }
+
+    function confirmRelapse() {
+        const checkboxes = document.querySelectorAll('#relapseCheckboxes input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            alert("No streaks selected.");
+            return;
         }
+        
+        const now = new Date().getTime();
+        checkboxes.forEach(cb => {
+            const streakIndex = userData.customStreaks.findIndex(s => s.id === cb.value);
+            if(streakIndex !== -1) userData.customStreaks[streakIndex].lastRelapse = now;
+        });
+
+        const today = initTodayHistory();
+        userData.history[today].relapsed = true;
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        
+        // Penalización unificada (-1 Nivel sin importar cuantas rompiste hoy)
+        addXP(-XP_PER_LEVEL);
+        closeRelapseModal();
     }
 
-    // ================= EDICIÓN Y SETTINGS =================
     function toggleSettings() {
         const modal = document.getElementById('settingsModal');
         modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
@@ -434,15 +519,13 @@
         if (type === 'habit') {
             let item = userData.customHabits.find(h => h.id === id);
             let newName = prompt("New habit name:", item.name);
-            let newEmoji = prompt("New emoji:", item.emoji);
+            let newXP = prompt("XP for this habit:", item.xp || 15);
             if(newName) item.name = newName;
-            if(newEmoji) item.emoji = newEmoji;
+            if(newXP && !isNaN(parseInt(newXP))) item.xp = parseInt(newXP);
         } else if (type === 'streak') {
             let item = userData.customStreaks.find(s => s.id === id);
             let newName = prompt("New streak name:", item.name);
-            let newEmoji = prompt("New emoji:", item.emoji);
             if(newName) item.name = newName;
-            if(newEmoji) item.emoji = newEmoji;
         } else if (type === 'reward') {
             let item = userData.customRewards.find(r => r.level === id);
             let newText = prompt(`New reward for level ${id}:`, item.text);
@@ -462,9 +545,10 @@
     function addNewHabit() {
         const emoji = document.getElementById('newHabitEmoji').value || '—';
         const name = document.getElementById('newHabitName').value.trim();
+        const xp = parseInt(document.getElementById('newHabitXP').value) || 15;
         if (!name) return;
-        userData.customHabits.push({ id: 'h_' + Date.now(), emoji: emoji, name: name });
-        document.getElementById('newHabitEmoji').value = ''; document.getElementById('newHabitName').value = '';
+        userData.customHabits.push({ id: 'h_' + Date.now(), emoji: emoji, name: name, xp: xp });
+        document.getElementById('newHabitEmoji').value = ''; document.getElementById('newHabitName').value = ''; document.getElementById('newHabitXP').value = '15';
         saveData(); renderSettingsLists();
     }
     
@@ -508,27 +592,28 @@
                 if(imported.xp !== undefined && imported.level !== undefined) {
                     userData = imported;
                     
-                    // Parche de variables al importar archivo viejo
                     userData.onboardingDone = true; 
                     if(userData.notes === undefined) userData.notes = "";
                     if(userData.username === undefined) userData.username = "User";
+                    if(userData.darkMode === undefined) userData.darkMode = false;
                     
                     saveData();
                     alert("Data imported successfully.");
                     toggleSettings();
+                    if(userData.darkMode) document.body.classList.add('dark-mode');
+                    else document.body.classList.remove('dark-mode');
                 } else { alert("Invalid file."); }
             } catch(err) { alert("Error reading JSON file."); }
         };
         reader.readAsText(file);
     }
 
-    // ================= RENDER UI =================
     function renderSettingsLists() {
         const hl = document.getElementById('settingsHabitList'); hl.innerHTML = '';
         userData.customHabits.forEach(h => {
             hl.innerHTML += `
-                <li class="list-item" style="border:none; border-bottom: 1px dotted #ccc; padding:8px 0;">
-                    <span>${h.emoji} ${h.name}</span> 
+                <li class="list-item" style="border:none; border-bottom: 1px dotted var(--text-muted); padding:8px 0;">
+                    <span>${h.emoji} ${h.name} (+${h.xp || 15} XP)</span> 
                     <div class="action-buttons">
                         <button class="btn-icon-small" onclick="editItem('habit', '${h.id}')" style="border:none;">✏️</button>
                         <button class="btn-del" onclick="deleteItem('habit', '${h.id}')" style="border:none;">✖</button>
@@ -538,7 +623,7 @@
         const sl = document.getElementById('settingsStreakList'); sl.innerHTML = '';
         userData.customStreaks.forEach(s => {
             sl.innerHTML += `
-                <li class="list-item" style="border:none; border-bottom: 1px dotted #ccc; padding:8px 0;">
+                <li class="list-item" style="border:none; border-bottom: 1px dotted var(--text-muted); padding:8px 0;">
                     <span>${s.emoji} ${s.name}</span> 
                     <div class="action-buttons">
                         <button class="btn-icon-small" onclick="editItem('streak', '${s.id}')" style="border:none;">✏️</button>
@@ -549,7 +634,7 @@
         const rl = document.getElementById('settingsRewardList'); rl.innerHTML = '';
         userData.customRewards.forEach(r => {
             rl.innerHTML += `
-                <li class="list-item" style="border:none; border-bottom: 1px dotted #ccc; padding:8px 0;">
+                <li class="list-item" style="border:none; border-bottom: 1px dotted var(--text-muted); padding:8px 0;">
                     <span>Lvl ${r.level}: ${r.text}</span> 
                     <div class="action-buttons">
                         <button class="btn-icon-small" onclick="editItem('reward', ${r.level})" style="border:none;">✏️</button>
@@ -562,7 +647,6 @@
     function updateUI() {
         initTodayHistory();
 
-        // Datos del Perfil y Notas
         document.getElementById('usernameDisplay').innerText = userData.username;
         document.getElementById('userAvatar').src = userData.avatarBase64;
         document.getElementById('appNotes').value = userData.notes || "";
@@ -581,29 +665,54 @@
         });
         document.getElementById('rewardDisplay').innerText = currentReward;
 
-        const mainList = document.getElementById('mainList');
-        mainList.innerHTML = '';
-        
+        const streakList = document.getElementById('streakList');
+        streakList.innerHTML = '';
         userData.customStreaks.forEach(streak => {
             const days = getStreakDays(streak.lastRelapse);
-            mainList.innerHTML += `
+            streakList.innerHTML += `
                 <li class="list-item">
-                    <div class="streak-info">
+                    <div class="item-info">
                         <span>${streak.emoji} ${streak.name}</span>
-                        <span class="streak-days">${days} days</span>
+                        <span class="item-subtext">${days} days undefeated</span>
                     </div>
-                    <button class="btn-reset" onclick="triggerRelapse('${streak.id}', '${streak.name}')">Reset</button>
                 </li>`;
         });
 
+        const habitList = document.getElementById('habitList');
+        habitList.innerHTML = '';
         const todayStr = new Date().toDateString();
+        const todayNoTime = new Date().setHours(0,0,0,0);
+        
         userData.customHabits.forEach(habit => {
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
-            mainList.innerHTML += `
+            const habitXP = habit.xp || 15;
+            
+            // Lógica de cálculo de "Hace cuántos días" y color rojo (>10 días)
+            let timeText = "Never done";
+            let isRed = false;
+            
+            if (userData.completedHabits[habit.id]) {
+                const lastDate = new Date(userData.completedHabits[habit.id]).setHours(0,0,0,0);
+                const diffDays = Math.floor((todayNoTime - lastDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) { timeText = "Done today"; } 
+                else if (diffDays === 1) { timeText = "Yesterday"; } 
+                else { 
+                    timeText = `${diffDays} days ago`; 
+                    if (diffDays > 10) isRed = true;
+                }
+            } else {
+                isRed = true;
+            }
+
+            habitList.innerHTML += `
                 <li class="list-item">
-                    <span>${habit.emoji} ${habit.name}</span>
-                    <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}')">
-                        ${isCompleted ? 'Done' : '+ XP'}
+                    <div class="item-info">
+                        <span class="${isRed ? 'text-danger' : ''}">${habit.emoji} ${habit.name}</span>
+                        <span class="item-subtext ${isRed ? 'text-danger' : ''}">${timeText}</span>
+                    </div>
+                    <button class="btn-add" ${isCompleted ? 'disabled' : ''} onclick="completeHabit('${habit.id}', ${habitXP})">
+                        ${isCompleted ? 'Done' : '+ ' + habitXP + ' XP'}
                     </button>
                 </li>`;
         });
@@ -623,17 +732,20 @@
         }
         if(chartInstance) chartInstance.destroy();
         
-        // Estética del gráfico monocromática
-        Chart.defaults.color = '#999';
+        // Estética adaptable al dark mode
+        const barColor = userData.darkMode ? '#e8e8e8' : '#000000';
+        const gridColor = userData.darkMode ? '#333333' : '#eeeeee';
+        
+        Chart.defaults.color = '#888';
         Chart.defaults.font.family = '-apple-system';
         
         chartInstance = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: '#000000', borderRadius: 0 }] },
+            data: { labels: labels, datasets: [{ label: 'XP', data: data, backgroundColor: barColor, borderRadius: 0 }] },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
                 scales: { 
-                    y: { beginAtZero: true, grid: { color: '#eeeeee' }, ticks: { stepSize: 20 } }, 
+                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { stepSize: 20 } }, 
                     x: { grid: { display: false } } 
                 }, 
                 plugins: { legend: { display: false } } 
