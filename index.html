@@ -127,7 +127,8 @@
             padding: max(20px, env(safe-area-inset-top)) 15px 40px 15px; 
             width: 100vw; box-sizing: border-box;
         }
-        .onboarding-modal, .relapse-modal { z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+        /* CORRECCIÓN ACÁ: Se quitó el display: flex por defecto para que no sobrescriba el display: none */
+        .onboarding-modal, .relapse-modal { z-index: 3000; flex-direction: column; justify-content: center; align-items: center;}
         .modal-content-box { width: 100%; max-width: 400px; text-align: left; }
         
         .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
@@ -320,7 +321,7 @@
 
     let userData = savedData || {
         onboardingDone: false,
-        darkMode: false, // Guardar estado del modo oscuro
+        darkMode: false, 
         username: "User",
         installDate: new Date().getTime(),
         xp: 0,
@@ -345,23 +346,20 @@
         ]
     };
 
-    // Parche para variables nuevas en usuarios viejos
     if(userData.onboardingDone === undefined) userData.onboardingDone = false;
     if(userData.notes === undefined) userData.notes = "";
     if(userData.username === undefined) userData.username = "User";
     if(userData.darkMode === undefined) userData.darkMode = false;
     
-    // Auto-aplicar modo oscuro si estaba guardado
     if (userData.darkMode) document.body.classList.add('dark-mode');
 
     let chartInstance = null;
     let currentMonthOffset = 0; 
     let tempOnboardingImg = null;
 
-    // EVENT LISTENER: Recarga automática al volver a la app (Fix bug cambio de día en iOS)
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
-            updateUI(); // Forza a re-leer el "today" y actualizar los botones
+            updateUI(); 
         }
     });
 
@@ -456,7 +454,6 @@
         addXP(xpAmount || 15);
     }
 
-    // ================= SISTEMA DE RECAÍDA MASIVA =================
     function openRelapseModal() {
         const container = document.getElementById('relapseCheckboxes');
         container.innerHTML = '';
@@ -492,7 +489,6 @@
         userData.history[today].relapsed = true;
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         
-        // Penalización unificada (-1 Nivel sin importar cuantas rompiste hoy)
         addXP(-XP_PER_LEVEL);
         closeRelapseModal();
     }
@@ -687,7 +683,6 @@
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
             const habitXP = habit.xp || 15;
             
-            // Lógica de cálculo de "Hace cuántos días" y color rojo (>10 días)
             let timeText = "Never done";
             let isRed = false;
             
@@ -732,7 +727,6 @@
         }
         if(chartInstance) chartInstance.destroy();
         
-        // Estética adaptable al dark mode
         const barColor = userData.darkMode ? '#e8e8e8' : '#000000';
         const gridColor = userData.darkMode ? '#333333' : '#eeeeee';
         
