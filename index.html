@@ -25,7 +25,6 @@
             --text-muted: #777777; 
             --border: #000000;
             --danger: #d93838;
-            --invert-filter: invert(0);
         }
         
         /* Modo Oscuro Dinámico */
@@ -35,7 +34,6 @@
             --text-muted: #888888; 
             --border: #444444;
             --danger: #ff5555;
-            --invert-filter: invert(1) hue-rotate(180deg);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,7 +83,7 @@
         .list-container { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0; margin:0;}
         .list-item { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 0; background: transparent; 
+            padding: 12px 10px; background: transparent; 
             border-bottom: 1px dotted var(--text-muted); font-size: 0.95rem;
             word-wrap: break-word; overflow-wrap: break-word;
         }
@@ -117,9 +115,25 @@
         .cal-day.fail { background-color: transparent; color: var(--danger); text-decoration: line-through; border-color: var(--danger); opacity: 1;}
         .cal-header { text-align: center; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 5px; font-family: 'Playfair Display', serif; font-style: italic;}
         
-        textarea { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 12px; font-family: inherit; font-size: 0.95rem; border-radius: 0; resize: vertical; min-height: 100px; outline: none; }
+        /* Estilos de Notas y Tareas (Operations) */
+        details { margin-bottom: 15px; border-bottom: 1px dotted var(--text-muted); padding-bottom: 10px;}
+        details > summary { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; cursor: pointer; color: var(--text); outline: none; list-style: none; display: flex; align-items: center;}
+        details > summary::before { content: "+"; font-family: monospace; margin-right: 10px; font-size: 1.2rem; font-weight: bold;}
+        details[open] > summary::before { content: "-"; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        .task-list { list-style: none; padding: 0; margin-top: 10px; }
+        .task-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+        .task-row:last-child { border-bottom: none; }
+        .task-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--text); flex-shrink: 0;}
+        .task-text { flex: 1; font-size: 0.95rem; }
+        .task-completed .task-text { text-decoration: line-through; color: var(--text-muted); }
+        .task-time { font-size: 0.7rem; color: var(--text-muted); font-family: monospace;}
+
+        textarea { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 12px; font-family: inherit; font-size: 0.95rem; border-radius: 0; resize: vertical; min-height: 100px; outline: none; margin-top: 10px;}
         textarea:focus { border-width: 2px; }
 
+        /* Modales */
         .settings-modal, .onboarding-modal, .relapse-modal { 
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
             background: var(--bg-color); z-index: 2000; 
@@ -127,18 +141,19 @@
             padding: max(20px, env(safe-area-inset-top)) 15px 40px 15px; 
             width: 100vw; box-sizing: border-box;
         }
-        /* CORRECCIÓN ACÁ: Se quitó el display: flex por defecto para que no sobrescriba el display: none */
         .onboarding-modal, .relapse-modal { z-index: 3000; flex-direction: column; justify-content: center; align-items: center;}
         .modal-content-box { width: 100%; max-width: 400px; text-align: left; }
         
         .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px;}
         .settings-section { margin-bottom: 25px; padding: 10px 0; width: 100%; border-bottom: 1px dotted var(--text-muted);}
         
-        .edit-input-group { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; }
+        .edit-input-group { display: flex; gap: 8px; margin-bottom: 10px; width: 100%; align-items: center;}
         input[type="text"], input[type="number"] { 
             flex: 1; padding: 10px; border-radius: 0; border: 1px solid var(--border); 
             background: transparent; color: var(--text); font-size: 0.95rem; min-width: 0; font-family: inherit;
         }
+        input[type="color"] { border: 1px solid var(--border); background: transparent; cursor: pointer; height: 38px; width: 38px; padding: 2px;}
+        
         .file-upload-btn { background: transparent; border: 1px dashed var(--border); color: var(--text); padding: 12px; text-align: center; display: block; width: 100%; margin-bottom: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem;}
         input[type="file"] { display: none; }
         
@@ -146,14 +161,12 @@
         .chart-container { position: relative; height: 160px; width: 100%; margin-top: 15px;}
         .action-buttons { display: flex; gap: 5px; }
 
-        /* Estilos Checkbox Modal Recaída */
         .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px dotted var(--text-muted); padding-bottom: 10px;}
         .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--text); }
     </style>
 </head>
 <body>
 
-<!-- ================= PANTALLA DE BIENVENIDA ================= -->
 <div id="onboardingModal" class="onboarding-modal">
     <div class="modal-content-box" style="text-align: center;">
         <h2 style="justify-content: center; font-size: 2.5rem; font-style: italic;">Initiate.</h2>
@@ -167,7 +180,6 @@
     </div>
 </div>
 
-<!-- ================= MODAL DE RECAÍDA (BULK RESET) ================= -->
 <div id="relapseModal" class="relapse-modal">
     <div class="modal-content-box">
         <h2 style="font-size: 2rem; font-style: italic; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Report Relapse</h2>
@@ -238,9 +250,34 @@
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
     
+    <!-- NUEVO: Panel de Operaciones (Tareas, Rutinas, Notas) -->
     <div class="panel" style="border-bottom: none;">
-        <h3>Notes & Vision</h3>
-        <textarea id="appNotes" placeholder="Write thoughts here..." onchange="saveNotes()"></textarea>
+        <h3>Operations</h3>
+        
+        <details open>
+            <summary>Tasks</summary>
+            <div class="edit-input-group" style="margin-top:10px;">
+                <input type="text" id="newTaskInput" placeholder="Add task...">
+                <button class="btn-add" onclick="addTask()">Add</button>
+            </div>
+            <ul class="task-list" id="pendingTasks"></ul>
+            
+            <details style="margin-top:15px; opacity:0.6; border:none; padding-bottom:0;">
+                <summary style="font-size:0.9rem;">Completed (Auto-deletes in 2h)</summary>
+                <ul class="task-list" id="completedTasks"></ul>
+            </details>
+        </details>
+
+        <details>
+            <summary>Routines</summary>
+            <div id="routinesList" style="margin-top:10px;"></div>
+            <button class="btn-danger-outline" style="border-style:dashed;" onclick="addRoutine()">+ Create Routine</button>
+        </details>
+
+        <details>
+            <summary>Journal / Vision</summary>
+            <textarea id="appNotes" placeholder="Write your thoughts here..." onchange="saveNotes()"></textarea>
+        </details>
     </div>
 </div>
 
@@ -274,10 +311,11 @@
     </div>
 
     <div class="settings-section">
-        <h3 class="small-text">Daily Habits</h3>
+        <h3 class="small-text">Daily Habits (With Colors)</h3>
         <div class="edit-input-group">
+            <input type="color" id="newHabitColor" value="#000000" title="Tag Color">
             <input type="text" id="newHabitEmoji" placeholder="Emoji" style="flex: 0.2;">
-            <input type="text" id="newHabitName" placeholder="Name" style="flex: 0.5;">
+            <input type="text" id="newHabitName" placeholder="Name" style="flex: 0.4;">
             <input type="number" id="newHabitXP" placeholder="XP" value="15" style="flex: 0.3;">
             <button class="btn-add" onclick="addNewHabit()">+</button>
         </div>
@@ -308,17 +346,8 @@
     const XP_PER_LEVEL = 100;
     
     let savedData = JSON.parse(localStorage.getItem('detoxDataStoic'));
-    if (!savedData) {
-        let legacyData = JSON.parse(localStorage.getItem('detoxDataV5'));
-        if (legacyData && (legacyData.xp > 0 || legacyData.level > 1)) {
-            savedData = legacyData;
-            savedData.onboardingDone = true; 
-            savedData.username = "User";
-            savedData.notes = "";
-            localStorage.setItem('detoxDataStoic', JSON.stringify(savedData));
-        }
-    }
 
+    // Estructura base de datos
     let userData = savedData || {
         onboardingDone: false,
         darkMode: false, 
@@ -330,10 +359,14 @@
         notes: "",
         completedHabits: {}, 
         history: {}, 
+        tasks: [], // Tareas diarias
+        routines: [ // Rutinas de texto
+            { id: 'r1', title: 'Gym Protocol', content: '- Dynamic stretches\n- 5 min cardio' }
+        ],
         customHabits: [
-            { id: 'h1', emoji: '—', name: 'Physical Training', xp: 15 },
-            { id: 'h2', emoji: '—', name: 'Deep Work', xp: 15 },
-            { id: 'h3', emoji: '—', name: 'Restoration (8hrs)', xp: 15 }
+            { id: 'h1', emoji: '—', name: 'Physical Training', xp: 15, color: '#000000' },
+            { id: 'h2', emoji: '—', name: 'Deep Work', xp: 15, color: '#000000' },
+            { id: 'h3', emoji: '—', name: 'Restoration (8hrs)', xp: 15, color: '#000000' }
         ],
         customStreaks: [
             { id: 's1', emoji: '👁', name: 'Visual Discipline', lastRelapse: new Date().setHours(0,0,0,0) },
@@ -346,10 +379,14 @@
         ]
     };
 
+    // Parches para migración segura (No perder datos al actualizar)
     if(userData.onboardingDone === undefined) userData.onboardingDone = false;
     if(userData.notes === undefined) userData.notes = "";
     if(userData.username === undefined) userData.username = "User";
     if(userData.darkMode === undefined) userData.darkMode = false;
+    if(userData.tasks === undefined) userData.tasks = [];
+    if(userData.routines === undefined) userData.routines = [];
+    userData.customHabits.forEach(h => { if(!h.color) h.color = '#000000'; });
     
     if (userData.darkMode) document.body.classList.add('dark-mode');
 
@@ -357,10 +394,9 @@
     let currentMonthOffset = 0; 
     let tempOnboardingImg = null;
 
+    // Escucha cuando volves a la app para limpiar tareas vencidas y resetear días
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
-            updateUI(); 
-        }
+        if (document.visibilityState === "visible") updateUI(); 
     });
 
     function saveData() {
@@ -474,10 +510,7 @@
 
     function confirmRelapse() {
         const checkboxes = document.querySelectorAll('#relapseCheckboxes input[type="checkbox"]:checked');
-        if (checkboxes.length === 0) {
-            alert("No streaks selected.");
-            return;
-        }
+        if (checkboxes.length === 0) { alert("No streaks selected."); return; }
         
         const now = new Date().getTime();
         checkboxes.forEach(cb => {
@@ -493,6 +526,53 @@
         closeRelapseModal();
     }
 
+    // ================= TAREAS (TASKS) =================
+    function addTask() {
+        const input = document.getElementById('newTaskInput');
+        if (!input.value.trim()) return;
+        userData.tasks.push({ id: 't_' + Date.now(), text: input.value.trim(), completed: false, completedAt: null });
+        input.value = '';
+        saveData();
+    }
+
+    function toggleTask(id) {
+        const task = userData.tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            task.completedAt = task.completed ? Date.now() : null;
+            saveData();
+        }
+    }
+
+    function deleteTask(id) {
+        userData.tasks = userData.tasks.filter(t => t.id !== id);
+        saveData();
+    }
+
+    // ================= RUTINAS =================
+    function addRoutine() {
+        const title = prompt("Routine Name (e.g., Stretching):");
+        if (!title) return;
+        userData.routines.push({ id: 'r_' + Date.now(), title: title, content: "" });
+        saveData();
+    }
+
+    function saveRoutineContent(id, element) {
+        const routine = userData.routines.find(r => r.id === id);
+        if (routine) {
+            routine.content = element.value;
+            localStorage.setItem('detoxDataStoic', JSON.stringify(userData)); // Guarda sin recargar UI para no perder foco
+        }
+    }
+
+    function deleteRoutine(id) {
+        if(confirm("Delete this routine?")) {
+            userData.routines = userData.routines.filter(r => r.id !== id);
+            saveData();
+        }
+    }
+
+    // ================= SETTINGS =================
     function toggleSettings() {
         const modal = document.getElementById('settingsModal');
         modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
@@ -539,11 +619,12 @@
     }
 
     function addNewHabit() {
+        const color = document.getElementById('newHabitColor').value || '#000000';
         const emoji = document.getElementById('newHabitEmoji').value || '—';
         const name = document.getElementById('newHabitName').value.trim();
         const xp = parseInt(document.getElementById('newHabitXP').value) || 15;
         if (!name) return;
-        userData.customHabits.push({ id: 'h_' + Date.now(), emoji: emoji, name: name, xp: xp });
+        userData.customHabits.push({ id: 'h_' + Date.now(), emoji: emoji, name: name, xp: xp, color: color });
         document.getElementById('newHabitEmoji').value = ''; document.getElementById('newHabitName').value = ''; document.getElementById('newHabitXP').value = '15';
         saveData(); renderSettingsLists();
     }
@@ -587,12 +668,7 @@
                 const imported = JSON.parse(e.target.result);
                 if(imported.xp !== undefined && imported.level !== undefined) {
                     userData = imported;
-                    
                     userData.onboardingDone = true; 
-                    if(userData.notes === undefined) userData.notes = "";
-                    if(userData.username === undefined) userData.username = "User";
-                    if(userData.darkMode === undefined) userData.darkMode = false;
-                    
                     saveData();
                     alert("Data imported successfully.");
                     toggleSettings();
@@ -608,7 +684,7 @@
         const hl = document.getElementById('settingsHabitList'); hl.innerHTML = '';
         userData.customHabits.forEach(h => {
             hl.innerHTML += `
-                <li class="list-item" style="border:none; border-bottom: 1px dotted var(--text-muted); padding:8px 0;">
+                <li class="list-item" style="border:none; border-bottom: 1px dotted var(--text-muted); padding:8px 0; border-left: 4px solid ${h.color || 'var(--text)'}; padding-left: 10px;">
                     <span>${h.emoji} ${h.name} (+${h.xp || 15} XP)</span> 
                     <div class="action-buttons">
                         <button class="btn-icon-small" onclick="editItem('habit', '${h.id}')" style="border:none;">✏️</button>
@@ -642,6 +718,11 @@
 
     function updateUI() {
         initTodayHistory();
+
+        // 1. Limpieza de tareas vencidas (2 horas = 7200000 ms)
+        const nowMs = Date.now();
+        userData.tasks = userData.tasks.filter(t => !t.completed || (nowMs - t.completedAt < 7200000));
+        localStorage.setItem('detoxDataStoic', JSON.stringify(userData)); // Guardado silencioso
 
         document.getElementById('usernameDisplay').innerText = userData.username;
         document.getElementById('userAvatar').src = userData.avatarBase64;
@@ -682,6 +763,7 @@
         userData.customHabits.forEach(habit => {
             const isCompleted = userData.completedHabits[habit.id] === todayStr;
             const habitXP = habit.xp || 15;
+            const habitColor = habit.color || (userData.darkMode ? '#ffffff' : '#000000');
             
             let timeText = "Never done";
             let isRed = false;
@@ -701,7 +783,7 @@
             }
 
             habitList.innerHTML += `
-                <li class="list-item">
+                <li class="list-item" style="border-left: 3px solid ${habitColor}; padding-left: 10px;">
                     <div class="item-info">
                         <span class="${isRed ? 'text-danger' : ''}">${habit.emoji} ${habit.name}</span>
                         <span class="item-subtext ${isRed ? 'text-danger' : ''}">${timeText}</span>
@@ -710,6 +792,38 @@
                         ${isCompleted ? 'Done' : '+ ' + habitXP + ' XP'}
                     </button>
                 </li>`;
+        });
+
+        // Tareas (Tasks) Render
+        const pendingTasks = document.getElementById('pendingTasks');
+        const completedTasks = document.getElementById('completedTasks');
+        pendingTasks.innerHTML = ''; completedTasks.innerHTML = '';
+        
+        userData.tasks.forEach(t => {
+            const li = `
+                <li class="task-row ${t.completed ? 'task-completed' : ''}">
+                    <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask('${t.id}')">
+                    <span class="task-text">${t.text}</span>
+                    <button class="btn-icon-small" onclick="deleteTask('${t.id}')">✖</button>
+                </li>
+            `;
+            if (t.completed) completedTasks.innerHTML += li;
+            else pendingTasks.innerHTML += li;
+        });
+
+        // Rutinas Render
+        const rList = document.getElementById('routinesList');
+        rList.innerHTML = '';
+        userData.routines.forEach(r => {
+            rList.innerHTML += `
+                <div style="margin-top:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                        <span style="font-weight:bold; font-family:'Playfair Display', serif;">${r.title}</span>
+                        <button class="btn-icon-small" onclick="deleteRoutine('${r.id}')">✖</button>
+                    </div>
+                    <textarea style="min-height:80px; margin-top:0; border:none; border-left:1px dashed var(--text-muted); background:transparent;" onchange="saveRoutineContent('${r.id}', this)" placeholder="Write your routine here...">${r.content}</textarea>
+                </div>
+            `;
         });
 
         updateChart(); 
